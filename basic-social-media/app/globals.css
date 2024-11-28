@@ -10,6 +10,7 @@ body {
 
 .header {
   background: theme('colors.frame');
+  width: 80%;
 }
 
 .main-page {
@@ -17,5 +18,10 @@ body {
 }
 
 .login-component {
-  background: theme('colors.frame')
+  background: theme('colors.frame');
+  margin-top: 10rem;
+}
+
+.button {
+  background: theme('colors.content');
 }
