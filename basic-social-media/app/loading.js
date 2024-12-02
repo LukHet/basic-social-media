@@ -2,13 +2,13 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import "./globals.css"; // Import the CSS file
+import "./globals.css";
 
 export default function Spinner() {
   return (
     <div className="loader-container">
       <motion.span
-        className="span spin" // Add the appropriate class names
+        className="span spin"
         animate={{ rotate: 360 }}
         transition={{
           repeat: Infinity,
