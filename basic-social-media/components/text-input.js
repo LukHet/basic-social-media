@@ -2,7 +2,14 @@
 
 import { motion } from "framer-motion";
 
-export default function TextInput({ id, type, placeholder, label }) {
+export default function TextInput({
+  id,
+  type,
+  placeholder,
+  label,
+  onChange,
+  value,
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0 }}
@@ -19,6 +26,8 @@ export default function TextInput({ id, type, placeholder, label }) {
         id={id}
         type={type ? type : "text"}
         placeholder={placeholder}
+        value={value}
+        onChange={onChange}
       />
     </motion.div>
   );
