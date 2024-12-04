@@ -1,6 +1,7 @@
 import express from "express";
 import sqlite from "better-sqlite3";
 import cors from "cors";
+import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 
 const db = sqlite("data.db");
@@ -21,7 +22,7 @@ app.get("/users", (req, res) => {
   res.json(news);
 });
 
-app.post("/user-register", (req, res) => {
+app.post("/user-register", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -29,12 +30,15 @@ app.post("/user-register", (req, res) => {
   }
 
   const userId = uuidv4();
+  const saltRounds = 10;
 
   try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     db.prepare("INSERT INTO users (id, email, password) VALUES (?, ?, ?)").run(
       userId,
       email,
-      password
+      hashedPassword
     );
     res.status(200).json({ message: "User registered successfully" });
   } catch (err) {
