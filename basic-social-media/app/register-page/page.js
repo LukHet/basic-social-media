@@ -4,7 +4,6 @@ import TextInput from "@/components/text-input";
 import Button from "@/components/button";
 import axios from "axios";
 import { useState } from "react";
-import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -38,7 +37,7 @@ export default function LoginPage() {
 
     e.preventDefault();
     await axios
-      .post("http://localhost:8080/user-login", {
+      .post("http://localhost:8080/user-register", {
         email: email,
         password: password,
       })
@@ -74,16 +73,8 @@ export default function LoginPage() {
             onChange={handlePasswordChange}
             value={password}
           />
-          <Button label="Login" onClick={onButtonClick} />
-          <div className="flex mx-auto mt-5">
-            <p>
-              Don't have an account yet?
-              <Link href="/register-page" className="text-blue-700 underline">
-                {" "}
-                Register
-              </Link>
-            </p>
-          </div>
+          <Button label="Register" onClick={onButtonClick} />
+
           {errorMessages.length > 0 && (
             <div>
               {errorMessages.map((message, id) => (
