@@ -2,13 +2,16 @@ import express from "express";
 import sqlite from "better-sqlite3";
 import cors from "cors";
 import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid";
 
 const db = sqlite("data.db");
 
 function initDb() {
   db.prepare(
-    "CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT UNIQUE, password TEXT)"
+    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT UNIQUE, password TEXT)"
+  ).run();
+
+  db.prepare(
+    "CREATE TABLE IF NOT EXISTS sessions (id TEXT NOT NULL PRIMARY KEY, expires_at INTEGER NOT NULL, user_id TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id))"
   ).run();
 }
 
@@ -29,20 +32,18 @@ app.post("/user-register", async (req, res) => {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
-  const userId = uuidv4();
   const saltRounds = 10;
 
   try {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    db.prepare("INSERT INTO users (id, email, password) VALUES (?, ?, ?)").run(
-      userId,
+    db.prepare("INSERT INTO users (email, password) VALUES (?, ?)").run(
       email,
       hashedPassword
     );
     res.status(200).json({ message: "User registered successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Couldn't register the user", err });
+    res.status(500).json({ message: "Couldn't register the user. ", err });
   }
 });
 
@@ -77,3 +78,5 @@ app.post("/user-login", async (req, res) => {
 initDb();
 
 app.listen(8080);
+
+export default db;

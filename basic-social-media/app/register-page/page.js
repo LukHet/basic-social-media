@@ -41,8 +41,27 @@ export default function LoginPage() {
         email: email,
         password: password,
       })
-      .then((res) => console.log(res.data))
-      .catch((err) => console.log(err));
+      .then((res) => console.log(res))
+      .catch((err) => {
+        if (err.response && err.response.data) {
+          const message = err.response.data.message || "An error occurred";
+          const additionalMessage =
+            err.response.data.err &&
+            err.response.data.err.code === "SQLITE_CONSTRAINT_UNIQUE"
+              ? "It seems like an account for the chosen email already exists."
+              : "";
+
+          setErrorMessages((prevErrorMessages) => [
+            ...prevErrorMessages,
+            message + additionalMessage,
+          ]);
+          return;
+        }
+        setErrorMessages((prevErrorMessages) => [
+          ...prevErrorMessages,
+          "An unknown error occurred. Please try again later.",
+        ]);
+      });
   };
 
   const handleEmailChange = (e) => {
@@ -76,9 +95,9 @@ export default function LoginPage() {
           <Button label="Register" onClick={onButtonClick} />
 
           {errorMessages.length > 0 && (
-            <div>
+            <div className="mt-5">
               {errorMessages.map((message, id) => (
-                <p key={id} className="text-red-500">
+                <p key={id} className="text-red-400">
                   {message}
                 </p>
               ))}
