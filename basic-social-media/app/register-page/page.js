@@ -4,6 +4,7 @@ import TextInput from "@/components/text-input";
 import Button from "@/components/button";
 import axios from "axios";
 import { useState } from "react";
+import { redirect } from "next/dist/server/api-utils";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -36,32 +37,33 @@ export default function LoginPage() {
     }
 
     e.preventDefault();
-    await axios
-      .post("http://localhost:8080/user-register", {
+
+    try {
+      const res = await axios.post("http://localhost:8080/user-register", {
         email: email,
         password: password,
-      })
-      .then((res) => console.log(res))
-      .catch((err) => {
-        if (err.response && err.response.data) {
-          const message = err.response.data.message || "An error occurred";
-          const additionalMessage =
-            err.response.data.err &&
-            err.response.data.err.code === "SQLITE_CONSTRAINT_UNIQUE"
-              ? "It seems like an account for the chosen email already exists."
-              : "";
+      });
+      redirect("/main-page");
+    } catch (err) {
+      if (err.response && err.response.data) {
+        const message = err.response.data.message || "An error occurred";
+        const additionalMessage =
+          err.response.data.err &&
+          err.response.data.err.code === "SQLITE_CONSTRAINT_UNIQUE"
+            ? "It seems like an account for the chosen email already exists."
+            : "";
 
-          setErrorMessages((prevErrorMessages) => [
-            ...prevErrorMessages,
-            message + additionalMessage,
-          ]);
-          return;
-        }
+        setErrorMessages((prevErrorMessages) => [
+          ...prevErrorMessages,
+          message + additionalMessage,
+        ]);
+      } else {
         setErrorMessages((prevErrorMessages) => [
           ...prevErrorMessages,
           "An unknown error occurred. Please try again later.",
         ]);
-      });
+      }
+    }
   };
 
   const handleEmailChange = (e) => {
