@@ -4,12 +4,13 @@ import TextInput from "@/components/text-input";
 import Button from "@/components/button";
 import axios from "axios";
 import { useState } from "react";
-import { redirect } from "next/dist/server/api-utils";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessages, setErrorMessages] = useState([]);
+  const router = useRouter();
 
   const emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -43,7 +44,7 @@ export default function LoginPage() {
         email: email,
         password: password,
       });
-      redirect("/main-page");
+      router.push("/main-page");
     } catch (err) {
       if (err.response && err.response.data) {
         const message = err.response.data.message || "An error occurred";
