@@ -5,16 +5,27 @@ import express from "express";
 import bcrypt from "bcrypt";
 import cors from "cors";
 import db from "./db.js";
-import { createAuthSession } from "./auth.js";
+import { createAuthSession, verifySession } from "./auth.js";
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get("/users", (req, res) => {
   const users = db.prepare("SELECT * FROM users").all();
   res.json(users);
+});
+
+app.get("/main-page", verifySession, (req, res) => {
+  res
+    .status(200)
+    .json({ message: "Welcome to the main page", userId: req.userId });
 });
 
 app.post("/user-register", async (req, res) => {

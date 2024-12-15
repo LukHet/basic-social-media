@@ -40,9 +40,18 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:8080/user-register", {
-        email: email,
-        password: password,
+      const res = await axios.post(
+        "http://localhost:8080/user-register",
+        {
+          email: email,
+          password: password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      const check = await axios.get("http://localhost:8080/main-page", {
+        withCredentials: true,
       });
       router.push("/main-page");
     } catch (err) {

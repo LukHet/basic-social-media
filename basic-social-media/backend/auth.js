@@ -31,13 +31,32 @@ export async function createAuthSession(res, userId) {
         secure: process.env.NODE_ENV === "production",
         maxAge: 60 * 60 * 24 * 7,
         path: "/",
+        sameSite: "None",
       }
     );
-
     res.setHeader("Set-Cookie", cookieHeader);
-    console.log("Session cookie set successfully");
   } catch (err) {
-    console.error("Error creating auth session:", err);
     throw new Error("Failed to create auth session");
+  }
+}
+
+export async function verifySession(req, res, next) {
+  const cookies = cookie.parse(req.headers.cookie || "");
+  const sessionCookie = cookies[lucia.sessionCookieName];
+
+  if (!sessionCookie) {
+    return res.status(401).json({ message: "No session cookie found." });
+  }
+
+  try {
+    const session = await lucia.getSession(sessionCookie);
+    if (session) {
+      req.userId = session.user_id;
+      return next();
+    } else {
+      return res.status(401).json({ message: "Invalid session." });
+    }
+  } catch (err) {
+    return res.status(500).json({ message: "Failed to verify session.", err });
   }
 }
