@@ -31,10 +31,12 @@ export async function createAuthSession(res, userId) {
         secure: process.env.NODE_ENV === "production",
         maxAge: 60 * 60 * 24 * 7,
         path: "/",
-        sameSite: "None",
+        //sameSite: "None",
       }
     );
     res.setHeader("Set-Cookie", cookieHeader);
+    console.log("cookieHeader");
+    console.log(cookieHeader);
   } catch (err) {
     throw new Error("Failed to create auth session");
   }
@@ -49,7 +51,15 @@ export async function verifySession(req, res, next) {
   }
 
   try {
-    const session = await lucia.getSession(sessionCookie);
+    const session = db
+      .prepare("SELECT * FROM sessions WHERE id = ?")
+      .get(sessionCookie);
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (currentTime > session.expires_at) {
+      return res
+        .status(401)
+        .json({ message: "Session expired, please log in again." });
+    }
     if (session) {
       req.userId = session.user_id;
       return next();
