@@ -43,6 +43,7 @@ export async function createAuthSession(res, userId) {
 }
 
 export async function verifySession(req, res, next) {
+  console.log("verify");
   const cookies = cookie.parse(req.headers.cookie || "");
   const sessionCookie = cookies[lucia.sessionCookieName];
 

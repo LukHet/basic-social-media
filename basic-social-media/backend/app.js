@@ -22,7 +22,7 @@ app.get("/users", (req, res) => {
   res.json(users);
 });
 
-app.get("/main-page", verifySession, (req, res) => {
+app.get("/verify-user", verifySession, (req, res) => {
   res
     .status(200)
     .json({ message: "Welcome to the main page", userId: req.userId });

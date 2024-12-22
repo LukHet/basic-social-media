@@ -50,9 +50,6 @@ export default function LoginPage() {
           withCredentials: true,
         }
       );
-      const check = await axios.get("http://localhost:8080/main-page", {
-        withCredentials: true,
-      });
       router.push("/main-page");
     } catch (err) {
       if (err.response && err.response.data) {

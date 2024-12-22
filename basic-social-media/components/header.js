@@ -1,6 +1,6 @@
 import Button from "./button";
 
-export default function Header() {
+export default async function Header() {
   return (
     <>
       <header className="flex justify-center">
