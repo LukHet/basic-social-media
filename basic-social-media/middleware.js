@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 import axios from "axios";
 
 export async function middleware(request) {
@@ -13,18 +14,18 @@ export async function middleware(request) {
       },
       withCredentials: true,
     });
-
-    console.log("gitara");
   } catch (error) {
-    console.error("Error making API request:", error.message);
-    NextResponse.redirect(new URL("/login-page", request.nextUrl.origin));
+    return NextResponse.redirect(
+      new URL("/login-page", request.nextUrl.origin).href,
+      {
+        status: 303,
+      }
+    );
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/((?!login-page|register-page).*)", //matching all paths except for login and register pages
-  ],
+  matcher: ["/((?!_next|api/auth|login-page|register-page).*)"],
 };
