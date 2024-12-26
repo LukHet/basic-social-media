@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { redirect } from "next/navigation";
 import axios from "axios";
 
 export async function middleware(request) {
