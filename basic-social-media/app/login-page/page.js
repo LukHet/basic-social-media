@@ -5,11 +5,13 @@ import Button from "@/components/button";
 import axios from "axios";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessages, setErrorMessages] = useState([]);
+  const router = useRouter();
 
   const emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -27,7 +29,7 @@ export default function LoginPage() {
     if (!password || password.length < 8 || password.length > 64) {
       setErrorMessages((prevErrorMessages) => [
         ...prevErrorMessages,
-        "Provide a valid password longer than 8 characters!",
+        "Provide a valid password!",
       ]);
     }
 
@@ -38,12 +40,32 @@ export default function LoginPage() {
 
     e.preventDefault();
     await axios
-      .post("http://localhost:8080/user-login", {
-        email: email,
-        password: password,
-      })
-      .then((res) => console.log(res.data))
-      .catch((err) => console.log(err));
+      .post(
+        "http://localhost:8080/user-login",
+        {
+          email: email,
+          password: password,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => router.push("/main-page"))
+      .catch((err) => {
+        if (err.response && err.response.data) {
+          const message = err.response.data.message || "An error occurred";
+
+          setErrorMessages((prevErrorMessages) => [
+            ...prevErrorMessages,
+            message,
+          ]);
+        } else {
+          setErrorMessages((prevErrorMessages) => [
+            ...prevErrorMessages,
+            "An unknown error occurred. Please try again later.",
+          ]);
+        }
+      });
   };
 
   const handleEmailChange = (e) => {

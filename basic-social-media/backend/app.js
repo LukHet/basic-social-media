@@ -5,7 +5,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import cors from "cors";
 import db from "./db.js";
-import { createAuthSession, verifySession } from "./auth.js";
+import { createAuthSession, verifySession, deleteAuthSession } from "./auth.js";
 
 const app = express();
 
@@ -26,6 +26,13 @@ app.get("/verify-user", verifySession, (req, res) => {
   res
     .status(200)
     .json({ message: "Welcome to the main page", userId: req.userId });
+});
+
+app.get("/user-logout", async (req, res) => {
+  const foundUser = db
+    .prepare("SELECT * FROM sessions WHERE user_id = ?")
+    .get(email);
+  await deleteAuthSession(res, createdUser.lastInsertRowid);
 });
 
 app.post("/user-register", async (req, res) => {

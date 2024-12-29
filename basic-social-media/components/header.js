@@ -9,7 +9,9 @@ export default function Header({ inLoginButtonVisible }) {
           <Button label="Chat" href="chat" />
           {inLoginButtonVisible ? (
             <Button label="Log in" href="login-page" />
-          ) : null}
+          ) : (
+            <Button label="Log out" href="log-out" />
+          )}
         </nav>
       </header>
     </>

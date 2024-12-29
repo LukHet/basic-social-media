@@ -31,19 +31,36 @@ export async function createAuthSession(res, userId) {
         secure: process.env.NODE_ENV === "production",
         maxAge: 60 * 60 * 24 * 7,
         path: "/",
-        //sameSite: "None",
       }
     );
     res.setHeader("Set-Cookie", cookieHeader);
-    console.log("cookieHeader");
-    console.log(cookieHeader);
+  } catch (err) {
+    throw new Error("Failed to create auth session");
+  }
+}
+
+export async function deleteAuthSession(res, userId) {
+  try {
+    const session = await lucia.createSession(userId, {});
+    const sessionCookie = lucia.createSessionCookie(session.id);
+
+    const cookieHeader = cookie.serialize(
+      sessionCookie.name,
+      sessionCookie.value,
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 0,
+        path: "/",
+      }
+    );
+    res.setHeader("Set-Cookie", cookieHeader);
   } catch (err) {
     throw new Error("Failed to create auth session");
   }
 }
 
 export async function verifySession(req, res, next) {
-  console.log("verify");
   const cookies = cookie.parse(req.headers.cookie || "");
   const sessionCookie = cookies[lucia.sessionCookieName];
 
