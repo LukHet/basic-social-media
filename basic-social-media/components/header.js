@@ -1,6 +1,23 @@
+"use client";
+
 import Button from "./button";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function Header({ inLoginButtonVisible }) {
+  const router = useRouter();
+
+  const logout = async () => {
+    await axios
+      .get("http://localhost:8080/user-logout", {
+        withCredentials: true,
+      })
+      .then((res) => router.push("/main-page"))
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <>
       <header className="flex justify-center">
@@ -10,7 +27,7 @@ export default function Header({ inLoginButtonVisible }) {
           {inLoginButtonVisible ? (
             <Button label="Log in" href="login-page" />
           ) : (
-            <Button label="Log out" href="log-out" />
+            <Button label="Log out" onClick={logout} />
           )}
         </nav>
       </header>

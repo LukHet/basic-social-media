@@ -4,6 +4,7 @@ import "./setupCrypto.js";
 import express from "express";
 import bcrypt from "bcrypt";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import db from "./db.js";
 import { createAuthSession, verifySession, deleteAuthSession } from "./auth.js";
 
@@ -16,6 +17,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/users", (req, res) => {
   const users = db.prepare("SELECT * FROM users").all();
@@ -29,10 +31,25 @@ app.get("/verify-user", verifySession, (req, res) => {
 });
 
 app.get("/user-logout", async (req, res) => {
+  console.log(req.cookies.auth_session);
+  const authSessionFound = req.cookies.auth_session;
+
   const foundUser = db
-    .prepare("SELECT * FROM sessions WHERE user_id = ?")
-    .get(email);
-  await deleteAuthSession(res, createdUser.lastInsertRowid);
+    .prepare("SELECT * FROM sessions WHERE id = ?")
+    .get(authSessionFound);
+  console.log(foundUser);
+
+  if (!foundUser) {
+    return res.status(404).send("Session not found");
+  }
+
+  try {
+    await deleteAuthSession(res, foundUser.user_id);
+    res.send("Logged out successfully!");
+  } catch (error) {
+    console.error("Error deleting session:", error);
+    res.status(500).send("Failed to log out");
+  }
 });
 
 app.post("/user-register", async (req, res) => {
