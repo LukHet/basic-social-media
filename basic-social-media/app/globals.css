@@ -19,7 +19,7 @@ body {
 
 .login-component {
   background: theme('colors.frame');
-  margin-top: 10rem;
+  margin-top: 3rem;
 }
 
 .button {

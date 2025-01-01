@@ -6,7 +6,7 @@ const db = sqlite("data.db");
 
 function initDb() {
   db.prepare(
-    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE, password TEXT)"
+    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE, password TEXT, name TEXT, surname TEXT, birthdate DATE, gender TEXT, city TEXT, country TEXT)"
   ).run();
 
   db.prepare(

@@ -53,7 +53,8 @@ app.get("/user-logout", async (req, res) => {
 });
 
 app.post("/user-register", async (req, res) => {
-  const { email, password } = req.body;
+  const { name, surname, email, password, birthdate, gender, country, city } =
+    req.body;
 
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
@@ -65,8 +66,19 @@ app.post("/user-register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const createdUser = db
-      .prepare("INSERT INTO users (email, password) VALUES (?, ?)")
-      .run(email, hashedPassword);
+      .prepare(
+        "INSERT INTO users (name, surname, email, password, birthdate, gender, country, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+      )
+      .run(
+        name,
+        surname,
+        email,
+        hashedPassword,
+        birthdate,
+        gender,
+        country,
+        city
+      );
 
     await createAuthSession(res, createdUser.lastInsertRowid);
     res.status(200).json({ message: "User created successfully!" });
