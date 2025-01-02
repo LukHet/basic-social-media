@@ -19,9 +19,16 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/users", (req, res) => {
-  const users = db.prepare("SELECT * FROM users").all();
-  res.json(users);
+app.get("/user-data", (req, res) => {
+  const authSessionFound = req.cookies.auth_session;
+  const foundSession = db
+    .prepare("SELECT * FROM sessions WHERE id = ?")
+    .get(authSessionFound);
+  const foundUserId = parseInt(foundSession?.user_id);
+  const foundUserData = db
+    .prepare("SELECT * FROM users WHERE id = ?")
+    .get(foundUserId);
+  res.json(foundUserData);
 });
 
 app.get("/verify-user", verifySession, (req, res) => {
