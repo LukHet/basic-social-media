@@ -3,8 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-export default function Button(props) {
-  const { label, onClick, href } = props;
+export default function Button({ label, onClick, href }) {
   return (
     <motion.button
       whileHover={{ scale: 1.1 }}

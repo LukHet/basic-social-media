@@ -38,13 +38,11 @@ app.get("/verify-user", verifySession, (req, res) => {
 });
 
 app.get("/user-logout", async (req, res) => {
-  console.log(req.cookies.auth_session);
   const authSessionFound = req.cookies.auth_session;
 
   const foundUser = db
     .prepare("SELECT * FROM sessions WHERE id = ?")
     .get(authSessionFound);
-  console.log(foundUser);
 
   if (!foundUser) {
     return res.status(404).send("Session not found");
@@ -54,8 +52,26 @@ app.get("/user-logout", async (req, res) => {
     await deleteAuthSession(res, foundUser.user_id);
     res.send("Logged out successfully!");
   } catch (error) {
-    console.error("Error deleting session:", error);
     res.status(500).send("Failed to log out");
+  }
+});
+
+app.post("/user-post", verifySession, async (req, res) => {
+  const { content } = req.body;
+  const { userId } = req;
+
+  const postContent = content;
+  const foundUserId = userId;
+  try {
+    const createdPost = db
+      .prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)")
+      .run(foundUserId, postContent);
+
+    return res.status(200).json({ message: "Post published successfully!" });
+  } catch (err) {
+    return res
+      .status(400)
+      .json({ message: "There was an error during publishing post" });
   }
 });
 

@@ -43,7 +43,7 @@ export default function Header({ inLoginButtonVisible }) {
         <motion.div
           initial={{ opacity: 0, scale: 1 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="relative z-50 text-xl mt-2 font-bold"
+          className="fixed z-50 text-xl mt-2 font-bold"
         >
           Hello {username}
         </motion.div>

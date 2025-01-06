@@ -41,11 +41,8 @@ export async function createAuthSession(res, userId) {
 
 export async function deleteAuthSession(res, userId) {
   try {
-    console.log("session");
     const session = await lucia.createSession(userId, {});
-    console.log("sessionCookie");
     const sessionCookie = lucia.createSessionCookie(session.id);
-    console.log("cookie header");
     const cookieHeader = cookie.serialize(
       sessionCookie.name,
       sessionCookie.value,
@@ -56,8 +53,6 @@ export async function deleteAuthSession(res, userId) {
         path: "/",
       }
     );
-    console.log(cookieHeader);
-    console.log("set cookie");
     res.setHeader("Set-Cookie", cookieHeader);
   } catch (err) {
     throw new Error("Failed to create auth session");
