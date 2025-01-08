@@ -75,6 +75,11 @@ app.post("/user-post", verifySession, async (req, res) => {
   }
 });
 
+app.get("/posts", verifySession, async (req, res) => {
+  const posts = db.prepare("SELECT * from posts").all();
+  return res.status(200).json(posts);
+});
+
 app.post("/user-register", async (req, res) => {
   const { name, surname, email, password, birthdate, gender, country, city } =
     req.body;
