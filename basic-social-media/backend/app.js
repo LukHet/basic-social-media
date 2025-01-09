@@ -57,15 +57,17 @@ app.get("/user-logout", async (req, res) => {
 });
 
 app.post("/user-post", verifySession, async (req, res) => {
-  const { content } = req.body;
+  const { content, post_date } = req.body;
   const { userId } = req;
 
   const postContent = content;
   const foundUserId = userId;
   try {
     const createdPost = db
-      .prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)")
-      .run(foundUserId, postContent);
+      .prepare(
+        "INSERT INTO posts (user_id, content, post_date) VALUES (?, ?, ?)"
+      )
+      .run(foundUserId, postContent, post_date);
 
     return res.status(200).json({ message: "Post published successfully!" });
   } catch (err) {

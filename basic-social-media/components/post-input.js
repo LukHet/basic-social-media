@@ -30,11 +30,17 @@ export default function PostInput() {
   };
 
   const sendNewPost = async () => {
+    const currentDate = new Date();
+    const formattedCurrentDate = currentDate
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
     try {
       const res = await axios.post(
         "http://localhost:8080/user-post",
         {
           content: postValue,
+          post_date: formattedCurrentDate,
         },
         {
           withCredentials: true,
@@ -64,7 +70,8 @@ export default function PostInput() {
           className="main-page mt-5 max-w-screen-lg py-5 px-10 rounded-3xl container mx-auto"
           key={post.id}
         >
-          {post.content}
+          <p className="text-end">{post.post_date}</p>
+          <h2 className="mt-5">{post.content}</h2>
         </div>
       ))}
     </>
