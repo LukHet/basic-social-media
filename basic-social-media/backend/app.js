@@ -26,7 +26,9 @@ app.get("/user-data", (req, res) => {
     .get(authSessionFound);
   const foundUserId = parseInt(foundSession?.user_id);
   const foundUserData = db
-    .prepare("SELECT * FROM users WHERE id = ?")
+    .prepare(
+      "SELECT email, name, surname, birthdate, gender, city, country FROM users WHERE id = ?"
+    )
     .get(foundUserId);
   res.json(foundUserData);
 });
@@ -114,6 +116,23 @@ app.post("/user-register", async (req, res) => {
     res.status(200).json({ message: "User created successfully!" });
   } catch (err) {
     res.status(500).json({ message: "Couldn't register the user.", err });
+  }
+});
+
+app.post("/update-user-data", verifySession, async (req, res) => {
+  const { name, surname, email, birthdate, gender, country, city } = req.body;
+  const { userId } = req;
+
+  try {
+    const update = db
+      .prepare(
+        "UPDATE users SET name = ?, surname = ?, email = ?, birthdate = ?, gender = ?, country = ?, city = ? WHERE id = ?"
+      )
+      .run(name, surname, email, birthdate, gender, country, city, userId);
+    console.log(update);
+    res.status(200).json({ message: "User data has been updated" });
+  } catch (err) {
+    res.status(500).json({ message: "Couldn't update the user data" });
   }
 });
 

@@ -5,6 +5,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Header({ inLoginButtonVisible }) {
   const router = useRouter();
@@ -45,7 +46,13 @@ export default function Header({ inLoginButtonVisible }) {
           animate={{ opacity: 1, scale: 1 }}
           className="fixed z-50 text-xl mt-2 font-bold"
         >
-          Hello {username}
+          Hello{" "}
+          <Link
+            href="/profile-page"
+            className="button border-black border-2 p-1 rounded-xl"
+          >
+            {username}
+          </Link>
         </motion.div>
         <nav className="top-0 border-solid rounded-3xl pt-10 fixed border-b-black border-b-2 z-40 flex items-center justify-between flex-wrap p-6 header">
           <Button label="Main page" href="main-page" />
