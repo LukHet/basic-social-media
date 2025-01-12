@@ -15,6 +15,11 @@ export default function ProfileInfo() {
   const [gender, setGender] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
+  const [errorMessages, setErrorMessages] = useState([]);
+  const [updateInfo, setUpdateInfo] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const emailRegex =
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
   const getUserInfo = async () => {
     try {
@@ -27,7 +32,35 @@ export default function ProfileInfo() {
     }
   };
 
-  const updateUserInfo = async () => {
+  const updateUserInfo = async (e) => {
+    let newErrorMessages = [];
+
+    if (!mail || !emailRegex.test(mail)) {
+      newErrorMessages.push("Provide valid email address!");
+    }
+
+    if (name.length === 0) {
+      newErrorMessages.push("Provide valid name!");
+    }
+
+    if (surname.length === 0) {
+      newErrorMessages.push("Provide valid surname!");
+    }
+
+    if (!birthdate) {
+      newErrorMessages.push("Provide valid birthdate!");
+    }
+
+    if (city.length === 0) {
+      newErrorMessages.push("Provide valid city!");
+    }
+
+    if (newErrorMessages.length > 0) {
+      setErrorMessages(newErrorMessages);
+      e.preventDefault();
+      return;
+    }
+
     try {
       const res = await axios.post(
         "http://localhost:8080/update-user-data",
@@ -44,13 +77,27 @@ export default function ProfileInfo() {
           withCredentials: true,
         }
       );
+      setUpdateInfo("Your data has been changed!");
+      getUserInfo();
     } catch (err) {
-      console.error(err);
+      if (err.response && err.response.data) {
+        const message = err.response.data.message || "An error occurred";
+        setErrorMessages((prevErrorMessages) => [
+          ...prevErrorMessages,
+          message + additionalMessage,
+        ]);
+      } else {
+        setErrorMessages((prevErrorMessages) => [
+          ...prevErrorMessages,
+          "An unknown error occurred. Please try again later.",
+        ]);
+      }
     }
   };
 
   useEffect(() => {
     getUserInfo();
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -61,6 +108,10 @@ export default function ProfileInfo() {
     setGender(userInfo["gender"] || "");
     setCity(userInfo["city"] || "");
     setCountry(userInfo["country"] || "");
+
+    if (!isEditing) {
+      setUpdateInfo("");
+    }
   }, [isEditing]);
 
   const handleClick = () => {
@@ -160,27 +211,44 @@ export default function ProfileInfo() {
 
   return (
     <>
-      <div className="main-page mt-28 max-w-screen-sm p-5 rounded-3xl container mx-auto">
-        <h1 className="text-center font-bold">Your Data</h1>
-        {Object.keys(userInfo).map((key) => (
-          <div
-            key={key}
-            className="flex justify-between mx-auto border-b-2 border-black p-1 items-center"
-          >
-            <p>{key}: </p>
-            {!isEditing ? <p>{userInfo[key]}</p> : handleInputsForEdit(key)}
+      {isLoading ? null : (
+        <>
+          <div className="main-page mt-28 max-w-screen-sm p-5 rounded-3xl container mx-auto">
+            <h1 className="text-center font-bold">Your Data</h1>
+            {Object.keys(userInfo).map((key) => (
+              <div
+                key={key}
+                className="flex justify-between mx-auto border-b-2 border-black p-1 items-center"
+              >
+                <p>{key}: </p>
+                {!isEditing ? <p>{userInfo[key]}</p> : handleInputsForEdit(key)}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="flex flex-col">
-        <Button
-          label={isEditing ? "Quit editing your data" : "Edit your data"}
-          onClick={handleClick}
-        />
-        {isEditing ? (
-          <Button label="Update your data" onClick={updateUserInfo} />
-        ) : null}
-      </div>
+          <div className="flex flex-col">
+            {isEditing ? (
+              <Button
+                label="Update your data"
+                onClick={(e) => updateUserInfo(e)}
+              />
+            ) : null}
+            <Button
+              label={isEditing ? "Quit editing your data" : "Edit your data"}
+              onClick={handleClick}
+            />
+            <p className="text-center mt-2">{updateInfo}</p>
+          </div>
+          {errorMessages.length > 0 && (
+            <div className="mt-5 text-center">
+              {errorMessages.map((message, id) => (
+                <p key={id} className="text-red-400">
+                  {message}
+                </p>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </>
   );
 }
