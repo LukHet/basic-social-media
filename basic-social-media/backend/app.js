@@ -64,12 +64,15 @@ app.post("/user-post", verifySession, async (req, res) => {
 
   const postContent = content;
   const foundUserId = userId;
+
+  const foundUser = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+  const userName = `${foundUser.name} ${foundUser.surname}`;
   try {
     const createdPost = db
       .prepare(
-        "INSERT INTO posts (user_id, content, post_date) VALUES (?, ?, ?)"
+        "INSERT INTO posts (user_id, content, post_date, author) VALUES (?, ?, ?, ?)"
       )
-      .run(foundUserId, postContent, post_date);
+      .run(foundUserId, postContent, post_date, userName);
 
     return res.status(200).json({ message: "Post published successfully!" });
   } catch (err) {

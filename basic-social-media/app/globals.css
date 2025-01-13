@@ -8,6 +8,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.post-author::after {
+  content:url('../public/user.png')
+}
+
 .header {
   background: theme('colors.frame');
   width: 80%;

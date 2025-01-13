@@ -10,7 +10,7 @@ function initDb() {
   ).run();
 
   db.prepare(
-    "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, post_date DATE, content TEXT, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)"
+    "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, post_date DATE, content TEXT, author TEXT, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)"
   ).run();
 
   db.prepare(
