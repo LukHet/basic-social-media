@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import TextArea from "./text-area";
 import Button from "./button";
+import Post from "./post";
 
 export default function PostInput() {
   const [postValue, setPostValue] = useState("");
@@ -46,6 +47,7 @@ export default function PostInput() {
           withCredentials: true,
         }
       );
+      setPostValue("");
       setPostInfo(res?.data?.message);
       await getPosts();
     } catch (err) {
@@ -66,18 +68,7 @@ export default function PostInput() {
         <p className="mt-2">{postInfo}</p>
       </div>
       {posts.map((post) => (
-        <div
-          className="main-page mt-5 max-w-screen-lg py-5 px-10 rounded-3xl container mx-auto"
-          key={post.id}
-        >
-          <div className="flex justify-between">
-            <p className="button border-black border-2 p-1 rounded-xl post-author flex gap-2 align-center pt-2">
-              {post.author}
-            </p>
-            <p>{post.post_date}</p>
-          </div>
-          <h2 className="mt-5">{post.content}</h2>
-        </div>
+        <Post post={post} key={post.id} />
       ))}
     </>
   );
