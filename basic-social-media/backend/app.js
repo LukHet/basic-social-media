@@ -93,6 +93,24 @@ app.get("/user-posts", verifySession, async (req, res) => {
   return res.status(200).json(posts);
 });
 
+app.get("/other-user-posts", verifySession, async (req, res) => {
+  const { otherUserId } = req.query;
+  const posts = db
+    .prepare("SELECT * from posts WHERE user_id = ?")
+    .all(otherUserId);
+  return res.status(200).json(posts);
+});
+
+app.get("/other-user-data", verifySession, async (req, res) => {
+  const { otherUserId } = req.query;
+  const foundUserData = db
+    .prepare(
+      "SELECT email, name, surname, birthdate, gender, city, country FROM users WHERE id = ?"
+    )
+    .get(otherUserId);
+  return res.status(200).json(foundUserData);
+});
+
 app.post("/user-register", async (req, res) => {
   const { name, surname, email, password, birthdate, gender, country, city } =
     req.body;

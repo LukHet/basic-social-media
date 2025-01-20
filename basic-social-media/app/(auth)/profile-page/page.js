@@ -5,8 +5,8 @@ export default function ProfilePage() {
   return (
     <>
       <main>
-        <ProfileInfo />
-        <ProfilePosts />
+        <ProfileInfo isOwnProfile={true} />
+        <ProfilePosts isOwnProfile={true} />
       </main>
     </>
   );

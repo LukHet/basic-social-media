@@ -5,7 +5,7 @@ import axios from "axios";
 import Button from "./button";
 import TextInput from "./text-input";
 
-export default function ProfileInfo() {
+export default function ProfileInfo({ isOwnProfile, slug }) {
   const [userInfo, setUserInfo] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [mail, setMail] = useState("");
@@ -23,9 +23,14 @@ export default function ProfileInfo() {
 
   const getUserInfo = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/user-data", {
-        withCredentials: true,
-      });
+      const response = isOwnProfile
+        ? await axios.get("http://localhost:8080/user-data", {
+            withCredentials: true,
+          })
+        : await axios.get("http://localhost:8080/other-user-data", {
+            params: { otherUserId: slug },
+            withCredentials: true,
+          });
       setUserInfo(response.data);
     } catch (err) {
       console.error(err);
@@ -214,7 +219,9 @@ export default function ProfileInfo() {
       {isLoading ? null : (
         <>
           <div className="main-page mt-28 max-w-screen-sm p-5 rounded-3xl container mx-auto">
-            <h1 className="text-center font-bold">Your Data</h1>
+            <h1 className="text-center font-bold">
+              {isOwnProfile ? "Your Data" : "Profiles data"}
+            </h1>
             {Object.keys(userInfo).map((key) => (
               <div
                 key={key}
@@ -225,28 +232,34 @@ export default function ProfileInfo() {
               </div>
             ))}
           </div>
-          <div className="flex flex-col">
-            {isEditing ? (
-              <Button
-                label="Update your data"
-                onClick={(e) => updateUserInfo(e)}
-              />
-            ) : null}
-            <Button
-              label={isEditing ? "Quit editing your data" : "Edit your data"}
-              onClick={handleClick}
-            />
-            <p className="text-center mt-2">{updateInfo}</p>
-          </div>
-          {errorMessages.length > 0 && (
-            <div className="mt-5 text-center">
-              {errorMessages.map((message, id) => (
-                <p key={id} className="text-red-400">
-                  {message}
-                </p>
-              ))}
-            </div>
-          )}
+          {isOwnProfile ? (
+            <>
+              <div className="flex flex-col">
+                {isEditing ? (
+                  <Button
+                    label="Update your data"
+                    onClick={(e) => updateUserInfo(e)}
+                  />
+                ) : null}
+                <Button
+                  label={
+                    isEditing ? "Quit editing your data" : "Edit your data"
+                  }
+                  onClick={handleClick}
+                />
+                <p className="text-center mt-2">{updateInfo}</p>
+              </div>
+              {errorMessages.length > 0 && (
+                <div className="mt-5 text-center">
+                  {errorMessages.map((message, id) => (
+                    <p key={id} className="text-red-400">
+                      {message}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : null}
         </>
       )}
     </>
