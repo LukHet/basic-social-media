@@ -14,6 +14,14 @@ function initDb() {
   ).run();
 
   db.prepare(
+    "CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, post_id INTEGER NOT NULL, content TEXT, author TEXT, FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)"
+  ).run();
+
+  db.prepare(
+    "CREATE TABLE IF NOT EXISTS likes (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, post_id INTEGER NOT NULL, author TEXT, FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)"
+  ).run();
+
+  db.prepare(
     "CREATE TABLE IF NOT EXISTS sessions (id TEXT NOT NULL PRIMARY KEY, expires_at INTEGER NOT NULL, user_id INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id))"
   ).run();
 }
