@@ -101,6 +101,78 @@ app.get("/other-user-posts", verifySession, async (req, res) => {
   return res.status(200).json(posts);
 });
 
+app.get("/get-likes", verifySession, async (req, res) => {
+  const { postId } = req.query;
+  try {
+    const likes = db
+      .prepare("SELECT * from likes WHERE post_id = ?")
+      .all(postId);
+    return res.status(200).json(posts);
+  } catch (err) {
+    return res.status(404).jsonjson({ message: "Couldn't get likes: ", err });
+  }
+});
+
+app.get("/get-comments", verifySession, async (req, res) => {
+  const { postId } = req.query;
+  try {
+    const comments = db
+      .prepare("SELECT * from comments WHERE post_id = ?")
+      .all(postId);
+    return res.status(200).json(comments);
+  } catch (err) {
+    return res
+      .status(404)
+      .jsonjson({ message: "Couldn't find the comments: ", err });
+  }
+});
+
+app.post("/post-like", async (req, res) => {
+  const { postId } = req.body;
+  const { userId } = req;
+  try {
+    const foundUserData = db
+      .prepare("SELECT name, surname FROM users WHERE id = ?")
+      .get(userId);
+
+    const author = foundUserData.name + " " + foundUserData.surname;
+
+    const postLiked = db
+      .prepare("INSERT INTO likes (user_id, post_id, author) VALUES (?, ?, ?)")
+      .run(userId, postId, author);
+
+    return res.status(200).json({ message: "Post has been liked!" });
+  } catch (err) {
+    return res
+      .status(404)
+      .jsonjson({ message: "Couldn't like the post: ", err });
+  }
+});
+
+app.post("/post-comment", async (req, res) => {
+  const { postId, content } = req.body;
+  const { userId } = req;
+  try {
+    const foundUserData = db
+      .prepare("SELECT name, surname FROM users WHERE id = ?")
+      .get(userId);
+
+    const author = foundUserData.name + " " + foundUserData.surname;
+
+    const postCommented = db
+      .prepare(
+        "INSERT INTO comments (user_id, post_id, content, author) VALUES (?, ?, ?)"
+      )
+      .run(userId, postId, content, author);
+
+    return res.status(200).json({ message: "Post has been commented!" });
+  } catch (err) {
+    return res
+      .status(404)
+      .json({ message: "Couldn't post the comment: ", err });
+  }
+});
+
 app.get("/other-user-data", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
   const foundUserData = db
