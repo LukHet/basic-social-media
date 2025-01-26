@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Comment from "./comment";
 
 export default function Post({ post }) {
   const href = `/profile/${post.user_id}`;
@@ -14,6 +15,7 @@ export default function Post({ post }) {
         <p>{post.post_date}</p>
       </div>
       <div className="mt-5 text-xl">{post.content}</div>
+      <Comment />
     </div>
   );
 }
