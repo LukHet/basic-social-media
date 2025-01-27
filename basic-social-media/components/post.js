@@ -15,7 +15,7 @@ export default function Post({ post }) {
         <p>{post.post_date}</p>
       </div>
       <div className="mt-5 text-xl">{post.content}</div>
-      <Comment />
+      <Comment postId={post.id} />
     </div>
   );
 }
