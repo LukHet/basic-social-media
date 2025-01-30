@@ -169,9 +169,6 @@ app.post("/post-comment", verifySession, async (req, res) => {
       )
       .run(userId, postId, content, author);
 
-    console.log("post commented");
-    console.log(postCommented);
-
     return res.status(200).json({ message: "Post has been commented!" });
   } catch (err) {
     return res
