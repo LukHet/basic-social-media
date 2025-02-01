@@ -29,12 +29,18 @@ export default function Comment({ postId }) {
   };
 
   const postComment = async () => {
+    const currentDate = new Date();
+    const formattedCurrentDate = currentDate
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
     try {
       const res = await axios.post(
         "http://localhost:8080/post-comment",
         {
           content: comment,
           postId: postId,
+          comment_date: formattedCurrentDate,
         },
         {
           withCredentials: true,

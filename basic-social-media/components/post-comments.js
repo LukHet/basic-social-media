@@ -8,12 +8,15 @@ export default function PostComments({ comments }) {
             key={com.id}
             className="mt-3 border-black border-2 p-3 rounded-xl"
           >
-            <Link
-              href={`/profile/${com.user_id}`}
-              className="button border-black border-2 p-1 w-fit rounded-xl post-author flex gap-2 align-center pt-2"
-            >
-              {com.author}
-            </Link>
+            <div className="flex justify-between">
+              <Link
+                href={`/profile/${com.user_id}`}
+                className="button border-black border-2 p-1 w-fit rounded-xl post-author flex gap-2 align-center pt-2"
+              >
+                {com.author}
+              </Link>
+              <p>{com.comment_date}</p>
+            </div>
             <p className="mt-2">{com.content}</p>
           </div>
         ))

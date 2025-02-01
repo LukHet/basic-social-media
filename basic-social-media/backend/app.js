@@ -150,7 +150,7 @@ app.post("/post-like", async (req, res) => {
 });
 
 app.post("/post-comment", verifySession, async (req, res) => {
-  const { postId, content } = req.body;
+  const { postId, content, comment_date } = req.body;
   const { userId } = req;
   console.log(postId, content, userId);
   try {
@@ -158,16 +158,13 @@ app.post("/post-comment", verifySession, async (req, res) => {
       .prepare("SELECT name, surname FROM users WHERE id = ?")
       .get(userId);
 
-    console.log("found user data");
-    console.log(foundUserData);
-
     const author = foundUserData.name + " " + foundUserData.surname;
 
     const postCommented = db
       .prepare(
-        "INSERT INTO comments (user_id, post_id, content, author) VALUES (?, ?, ?, ?)"
+        "INSERT INTO comments (user_id, post_id, content, author, comment_date) VALUES (?, ?, ?, ?, ?)"
       )
-      .run(userId, postId, content, author);
+      .run(userId, postId, content, author, comment_date);
 
     return res.status(200).json({ message: "Post has been commented!" });
   } catch (err) {
