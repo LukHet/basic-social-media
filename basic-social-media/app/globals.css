@@ -12,6 +12,10 @@ body {
   content:url('../public/user.png')
 }
 
+.heart {
+  cursor: pointer;
+}
+
 .header {
   background: theme('colors.frame');
   width: 80%;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Comment from "./comment";
+import Like from "./like";
 
 export default function Post({ post }) {
   const href = `/profile/${post.user_id}`;
@@ -15,6 +16,7 @@ export default function Post({ post }) {
         <p>{post.post_date}</p>
       </div>
       <div className="mt-5 text-xl">{post.content}</div>
+      <Like postId={post.id} />
       <Comment postId={post.id} />
     </div>
   );

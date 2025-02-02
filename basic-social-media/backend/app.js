@@ -103,13 +103,15 @@ app.get("/other-user-posts", verifySession, async (req, res) => {
 
 app.get("/get-likes", verifySession, async (req, res) => {
   const { postId } = req.query;
+  console.log("postId: ", postId);
   try {
     const likes = db
       .prepare("SELECT * from likes WHERE post_id = ?")
       .all(postId);
-    return res.status(200).json(posts);
+    console.log("likes: ", likes);
+    return res.status(200).json(likes);
   } catch (err) {
-    return res.status(404).jsonjson({ message: "Couldn't get likes: ", err });
+    return res.status(404).json({ message: "Couldn't get likes: ", err });
   }
 });
 
@@ -152,7 +154,7 @@ app.post("/post-like", async (req, res) => {
 app.post("/post-comment", verifySession, async (req, res) => {
   const { postId, content, comment_date } = req.body;
   const { userId } = req;
-  console.log(postId, content, userId);
+
   try {
     const foundUserData = db
       .prepare("SELECT name, surname FROM users WHERE id = ?")
