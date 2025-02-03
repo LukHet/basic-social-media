@@ -33,6 +33,15 @@ app.get("/user-data", (req, res) => {
   res.json(foundUserData);
 });
 
+app.get("/user-id", (req, res) => {
+  const authSessionFound = req.cookies.auth_session;
+  const foundSession = db
+    .prepare("SELECT * FROM sessions WHERE id = ?")
+    .get(authSessionFound);
+  const foundUserId = parseInt(foundSession?.user_id);
+  res.json(foundUserId);
+});
+
 app.get("/verify-user", verifySession, (req, res) => {
   res
     .status(200)
@@ -103,12 +112,10 @@ app.get("/other-user-posts", verifySession, async (req, res) => {
 
 app.get("/get-likes", verifySession, async (req, res) => {
   const { postId } = req.query;
-  console.log("postId: ", postId);
   try {
     const likes = db
       .prepare("SELECT * from likes WHERE post_id = ?")
       .all(postId);
-    console.log("likes: ", likes);
     return res.status(200).json(likes);
   } catch (err) {
     return res.status(404).json({ message: "Couldn't get likes: ", err });
@@ -125,11 +132,11 @@ app.get("/get-comments", verifySession, async (req, res) => {
   } catch (err) {
     return res
       .status(404)
-      .jsonjson({ message: "Couldn't find the comments: ", err });
+      .json({ message: "Couldn't find the comments: ", err });
   }
 });
 
-app.post("/post-like", async (req, res) => {
+app.post("/post-like", verifySession, async (req, res) => {
   const { postId } = req.body;
   const { userId } = req;
   try {
@@ -145,9 +152,7 @@ app.post("/post-like", async (req, res) => {
 
     return res.status(200).json({ message: "Post has been liked!" });
   } catch (err) {
-    return res
-      .status(404)
-      .jsonjson({ message: "Couldn't like the post: ", err });
+    return res.status(404).json({ message: "Couldn't like the post: ", err });
   }
 });
 
@@ -231,7 +236,6 @@ app.post("/update-user-data", verifySession, async (req, res) => {
         "UPDATE users SET name = ?, surname = ?, email = ?, birthdate = ?, gender = ?, country = ?, city = ? WHERE id = ?"
       )
       .run(name, surname, email, birthdate, gender, country, city, userId);
-    console.log(update);
     res.status(200).json({ message: "User data has been updated" });
   } catch (err) {
     res.status(500).json({ message: "Couldn't update the user data" });

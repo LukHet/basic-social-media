@@ -10,6 +10,7 @@ export default function PostInput() {
   const [postValue, setPostValue] = useState("");
   const [postInfo, setPostInfo] = useState("");
   const [posts, setPosts] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const getPosts = async () => {
     try {
@@ -22,8 +23,20 @@ export default function PostInput() {
     }
   };
 
+  const getCurrentUsersId = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/user-id", {
+        withCredentials: true,
+      });
+      setCurrentUserId(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     getPosts();
+    getCurrentUsersId();
   }, []);
 
   const onPostValueChange = (e) => {
@@ -68,7 +81,7 @@ export default function PostInput() {
         <p className="mt-2">{postInfo}</p>
       </div>
       {posts.map((post) => (
-        <Post post={post} key={post.id} />
+        <Post post={post} key={post.id} userId={currentUserId} />
       ))}
     </>
   );

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Comment from "./comment";
 import Like from "./like";
 
-export default function Post({ post }) {
+export default function Post({ post, userId }) {
   const href = `/profile/${post.user_id}`;
   return (
     <div className="main-page mt-5 max-w-screen-lg py-5 px-10 rounded-3xl container mx-auto post">
@@ -16,7 +16,7 @@ export default function Post({ post }) {
         <p>{post.post_date}</p>
       </div>
       <div className="mt-5 text-xl">{post.content}</div>
-      <Like postId={post.id} />
+      <Like postId={post.id} userId={userId} />
       <Comment postId={post.id} />
     </div>
   );
