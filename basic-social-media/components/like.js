@@ -20,7 +20,24 @@ export default function Like({ postId, userId }) {
   };
 
   const handleHeartClick = async () => {
-    if (isLiked) return;
+    if (isLiked) {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/delete-like",
+          {
+            postId: postId,
+          },
+          { withCredentials: true }
+        );
+        setIsLiked(false);
+        getLikes();
+        setImgSrc("/heart.png");
+      } catch (err) {
+        console.error(err);
+      }
+      return;
+    }
+
     try {
       const response = await axios.post(
         "http://localhost:8080/post-like",

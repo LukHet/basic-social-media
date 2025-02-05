@@ -156,6 +156,20 @@ app.post("/post-like", verifySession, async (req, res) => {
   }
 });
 
+app.post("/delete-like", verifySession, async (req, res) => {
+  const { postId } = req.body;
+  const { userId } = req;
+  try {
+    const deleteLiked = db
+      .prepare("DELETE FROM likes WHERE user_id=? AND post_id=?")
+      .run(userId, postId);
+
+    return res.status(200).json({ message: "Post has been unliked!" });
+  } catch (err) {
+    return res.status(404).json({ message: "Couldn't unlike the post: ", err });
+  }
+});
+
 app.post("/post-comment", verifySession, async (req, res) => {
   const { postId, content, comment_date } = req.body;
   const { userId } = req;
