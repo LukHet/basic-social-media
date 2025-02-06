@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
+import LikesPopup from "./likes-popup";
 
 export default function Like({ postId, userId }) {
   const [imgSrc, setImgSrc] = useState("/heart.png");
   const [likes, setLikes] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   const setImgToLiked = () => {
     if (isLiked) return;
@@ -60,9 +62,18 @@ export default function Like({ postId, userId }) {
         withCredentials: true,
       });
       setLikes(response.data);
+      console.log(response.data);
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleMouseOverNumber = () => {
+    setShowPopup(true);
+  };
+
+  const handleMouseNotOverNumber = () => {
+    setShowPopup(false);
   };
 
   useEffect(() => {
@@ -90,7 +101,16 @@ export default function Like({ postId, userId }) {
         onMouseOut={setImgToNotLiked}
         onClick={handleHeartClick}
       />
-      <p>{likes ? likes.length : 0}</p>
+      <p
+        onMouseOver={handleMouseOverNumber}
+        onMouseOut={handleMouseNotOverNumber}
+        className="text-xl"
+      >
+        Likes: {likes ? likes.length : 0}
+      </p>
+      {likes && likes.length ? (
+        <LikesPopup likes={likes} showPopup={showPopup} />
+      ) : null}
     </div>
   );
 }
