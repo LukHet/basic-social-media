@@ -56,13 +56,14 @@ export default function Like({ postId, userId }) {
   };
 
   const getLikes = async () => {
+    console.log("getting likes");
     try {
       const response = await axios.get("http://localhost:8080/get-likes", {
         params: { postId: postId },
         withCredentials: true,
       });
       setLikes(response.data);
-      console.log(response.data);
+      console.log("likes: ", response.data);
     } catch (err) {
       console.error(err);
     }
@@ -97,17 +98,16 @@ export default function Like({ postId, userId }) {
         height={32}
         alt="heart"
         className="heart mr-2"
-        onMouseOver={setImgToLiked}
-        onMouseOut={setImgToNotLiked}
+        onMouseEnter={setImgToLiked}
+        onMouseLeave={setImgToNotLiked}
         onClick={handleHeartClick}
       />
-      <p
-        onMouseOver={handleMouseOverNumber}
-        onMouseOut={handleMouseNotOverNumber}
-        className="text-xl"
+      <div
+        onMouseEnter={handleMouseOverNumber}
+        onMouseLeave={handleMouseNotOverNumber}
       >
-        Likes: {likes ? likes.length : 0}
-      </p>
+        <p className="text-xl">Likes: {likes ? likes.length : 0}</p>
+      </div>
       {likes && likes.length ? (
         <LikesPopup likes={likes} showPopup={showPopup} />
       ) : null}

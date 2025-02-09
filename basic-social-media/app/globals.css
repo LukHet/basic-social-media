@@ -12,7 +12,7 @@ body {
   content:url('../public/user.png')
 }
 
-.heart {
+.heart, .bin {
   cursor: pointer;
 }
 

@@ -170,6 +170,16 @@ app.post("/delete-like", verifySession, async (req, res) => {
   }
 });
 
+app.post("/delete-post", verifySession, async (req, res) => {
+  const { postId } = req.body;
+  try {
+    const deletedPost = db.prepare("DELETE FROM posts WHERE id=?").run(postId);
+    return res.status(200).json({ message: "Post has been deleted!" });
+  } catch (err) {
+    return res.status(404).json({ message: "Couldn't unlike the post: ", err });
+  }
+});
+
 app.post("/post-comment", verifySession, async (req, res) => {
   const { postId, content, comment_date } = req.body;
   const { userId } = req;

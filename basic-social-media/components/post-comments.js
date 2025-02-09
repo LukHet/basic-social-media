@@ -2,25 +2,24 @@ import Link from "next/link";
 
 export default function PostComments({ comments }) {
   const allComments =
-    comments.length > 0
-      ? comments.map((com) => (
-          <div
-            key={com.id}
-            className="mt-3 border-black border-2 p-3 rounded-xl"
-          >
-            <div className="flex justify-between">
-              <Link
-                href={`/profile/${com.user_id}`}
-                className="button border-black border-2 p-1 w-fit rounded-xl post-author flex gap-2 align-center pt-2"
-              >
-                {com.author}
-              </Link>
-              <p>{com.comment_date}</p>
-            </div>
-            <p className="mt-2">{com.content}</p>
+    comments.length > 0 ? (
+      comments.map((com) => (
+        <div key={com.id} className="mt-3 border-black border-2 p-3 rounded-xl">
+          <div className="flex justify-between">
+            <Link
+              href={`/profile/${com.user_id}`}
+              className="button border-black border-2 p-1 w-fit rounded-xl post-author flex gap-2 align-center pt-2"
+            >
+              {com.author}
+            </Link>
+            <p>{com.comment_date}</p>
           </div>
-        ))
-      : null;
+          <p className="mt-2">{com.content}</p>
+        </div>
+      ))
+    ) : (
+      <p className="mt-3">There are no comments yet!</p>
+    );
 
   return (
     <div className="mt-8">

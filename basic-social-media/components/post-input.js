@@ -68,6 +68,21 @@ export default function PostInput() {
     }
   };
 
+  const deletePost = async (post_id) => {
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/delete-post",
+        {
+          postId: post_id,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      await getPosts();
+    } catch (err) {}
+  };
+
   return (
     <>
       <div className="main-page mt-28 max-w-screen-lg p-5 rounded-3xl container mx-auto">
@@ -81,7 +96,12 @@ export default function PostInput() {
         <p className="mt-2">{postInfo}</p>
       </div>
       {posts.map((post) => (
-        <Post post={post} key={post.id} userId={currentUserId} />
+        <Post
+          post={post}
+          key={post.id}
+          deletePost={() => deletePost(post.id)}
+          userId={currentUserId}
+        />
       ))}
     </>
   );

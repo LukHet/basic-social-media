@@ -7,10 +7,10 @@ export default function LikesPopup({ likes, showPopup }) {
 
   useEffect(() => {
     setLikesAuthors(likes);
-  }, []);
+  }, [likes]);
 
   return showPopup ? (
-    <div className="absolute p-10 bg-gray-500/90 backdrop-opacity-10">
+    <div className="absolute mt-10 border border-black rounded-md p-5 bg-gray-500/90 backdrop-opacity-10">
       {likesAuthors.map((el) => (
         <p key={el.id}>{el.author}</p>
       ))}
