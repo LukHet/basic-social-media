@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import PostComments from "./post-comments";
 
-export default function Comment({ postId }) {
+export default function Comment({ postId, userId }) {
   const [comment, setComment] = useState("");
   const [postComments, setPostComments] = useState([]);
 
@@ -25,6 +25,21 @@ export default function Comment({ postId }) {
         withCredentials: true,
       });
       setPostComments(res.data);
+    } catch (err) {}
+  };
+
+  const deleteComment = async (commentId) => {
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/delete-comment",
+        {
+          commentId: commentId,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      await getPostComments();
     } catch (err) {}
   };
 
@@ -61,7 +76,11 @@ export default function Comment({ postId }) {
         />
         <Button label="Post comment" onClick={postComment} />
       </div>
-      <PostComments comments={postComments} />
+      <PostComments
+        comments={postComments}
+        userId={userId}
+        deleteComment={deleteComment}
+      />
     </div>
   );
 }

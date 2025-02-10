@@ -176,7 +176,7 @@ app.post("/delete-post", verifySession, async (req, res) => {
     const deletedPost = db.prepare("DELETE FROM posts WHERE id=?").run(postId);
     return res.status(200).json({ message: "Post has been deleted!" });
   } catch (err) {
-    return res.status(404).json({ message: "Couldn't unlike the post: ", err });
+    return res.status(404).json({ message: "Couldn't delete the post: ", err });
   }
 });
 
@@ -202,6 +202,22 @@ app.post("/post-comment", verifySession, async (req, res) => {
     return res
       .status(404)
       .json({ message: "Couldn't post the comment: ", err });
+  }
+});
+
+app.post("/delete-comment", verifySession, async (req, res) => {
+  const { commentId } = req.body;
+
+  try {
+    const commentToDelete = db
+      .prepare("DELETE from comments WHERE id = ?")
+      .run(commentId);
+
+    return res.status(200).json({ message: "Comment has been deleted!" });
+  } catch (err) {
+    return res
+      .status(404)
+      .json({ message: "Couldn't delete the comment: ", err });
   }
 });
 

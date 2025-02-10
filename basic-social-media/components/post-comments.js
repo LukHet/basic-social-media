@@ -1,6 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 
-export default function PostComments({ comments }) {
+export default function PostComments({ comments, userId, deleteComment }) {
   const allComments =
     comments.length > 0 ? (
       comments.map((com) => (
@@ -12,7 +13,19 @@ export default function PostComments({ comments }) {
             >
               {com.author}
             </Link>
-            <p>{com.comment_date}</p>
+            <div className="flex h-fit items-center">
+              <p>{com.comment_date}</p>
+              {com.user_id === userId ? (
+                <Image
+                  className="ml-3 bin"
+                  src="/bin.png"
+                  width={32}
+                  height={32}
+                  alt="bin"
+                  onClick={() => deleteComment(com.id)}
+                />
+              ) : null}
+            </div>
           </div>
           <p className="mt-2">{com.content}</p>
         </div>

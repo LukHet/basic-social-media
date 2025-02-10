@@ -30,7 +30,7 @@ export default function Post({ post, userId, deletePost }) {
       </div>
       <div className="mt-5 text-xl">{post.content}</div>
       <Like postId={post.id} userId={userId} />
-      <Comment postId={post.id} />
+      <Comment postId={post.id} userId={userId} />
     </div>
   );
 }
