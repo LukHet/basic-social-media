@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import SearchInput from "./search-input";
 
 export default function Header({ inLoginButtonVisible }) {
   const router = useRouter();
@@ -55,13 +56,16 @@ export default function Header({ inLoginButtonVisible }) {
           </Link>
         </motion.div>
         <nav className="top-0 border-solid rounded-3xl pt-10 fixed border-b-black border-b-2 z-40 flex items-center justify-between flex-wrap p-6 header">
-          <Button label="Main page" href="/main-page" />
-          <Button label="Chat" href="/chat" />
-          {inLoginButtonVisible ? (
-            <Button label="Log in" href="/login-page" />
-          ) : (
-            <Button label="Log out" onClick={logout} />
-          )}
+          <>
+            <SearchInput />
+            <Button label="Main page" href="/main-page" />
+            <Button label="Chat" href="/chat" />
+            {inLoginButtonVisible ? (
+              <Button label="Log in" href="/login-page" />
+            ) : (
+              <Button label="Log out" onClick={logout} />
+            )}
+          </>
         </nav>
       </header>
     </>

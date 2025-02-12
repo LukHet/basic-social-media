@@ -12,6 +12,27 @@ body {
   content:url('../public/user.png')
 }
 
+.fixed-centered {
+   transform: translate(-50%, -50%);
+}
+
+.search {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 20px;
+  position: absolute;
+  top: 24px;
+  left: 169px;
+  padding: 18px 20px;
+  z-index: 2;
+}
+
+.search::before {
+  content:url('../public/search.png');
+}
+
 .heart, .bin {
   cursor: pointer;
 }
