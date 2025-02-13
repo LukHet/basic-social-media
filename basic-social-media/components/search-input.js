@@ -31,7 +31,7 @@ export default function SearchInput({
         value={value}
         onChange={onChange}
       />
-      <button type="submit" className="search"></button>
+      <div className="search"></div>
     </motion.div>
   );
 }

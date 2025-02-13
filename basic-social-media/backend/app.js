@@ -136,6 +136,20 @@ app.get("/get-comments", verifySession, async (req, res) => {
   }
 });
 
+app.get("/search-users", verifySession, async (req, res) => {
+  const { searchValue } = req.query;
+
+  try {
+    const foundUsers = db
+      .prepare("SELECT * FROM users WHERE name LIKE ? OR surname LIKE ?")
+      .all([`%${searchValue}%`, `%${searchValue}%`]);
+
+    res.status(200).json(foundUsers);
+  } catch (err) {
+    res.status(404).json({ message: "Couldn't find the users: ", err });
+  }
+});
+
 app.post("/post-like", verifySession, async (req, res) => {
   const { postId } = req.body;
   const { userId } = req;

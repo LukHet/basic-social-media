@@ -11,6 +11,8 @@ import SearchInput from "./search-input";
 export default function Header({ inLoginButtonVisible }) {
   const router = useRouter();
   const [username, setUsername] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const [foundUsers, setFoundUsers] = useState([]);
 
   useEffect(() => {
     const userData = async () => {
@@ -28,6 +30,22 @@ export default function Header({ inLoginButtonVisible }) {
     userData();
   }, []);
 
+  useEffect(() => {
+    const getSearchResults = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/search-users", {
+          params: { searchValue: searchValue },
+          withCredentials: true,
+        });
+        setFoundUsers(response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    getSearchResults();
+  }, [searchValue]);
+
   const logout = async () => {
     await axios
       .get("http://localhost:8080/user-logout", {
@@ -37,6 +55,10 @@ export default function Header({ inLoginButtonVisible }) {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const handleSearch = (e) => {
+    setSearchValue(e.target.value);
   };
 
   return (
@@ -57,7 +79,10 @@ export default function Header({ inLoginButtonVisible }) {
         </motion.div>
         <nav className="top-0 border-solid rounded-3xl pt-10 fixed border-b-black border-b-2 z-40 flex items-center justify-between flex-wrap p-6 header">
           <>
-            <SearchInput />
+            <SearchInput value={searchValue} onChange={handleSearch} />
+            {/* {foundUsers && foundUsers.length > 0
+              ? foundUsers.map((user) => <div key={user.id}>{user.name}</div>)
+              : null} */}
             <Button label="Main page" href="/main-page" />
             <Button label="Chat" href="/chat" />
             {inLoginButtonVisible ? (
