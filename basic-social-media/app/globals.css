@@ -19,7 +19,6 @@ body {
 .search {
   background: transparent;
   border: none;
-  cursor: pointer;
   display: inline-block;
   font-size: 20px;
   position: absolute;
@@ -27,6 +26,10 @@ body {
   left: 169px;
   padding: 18px 20px;
   z-index: 2;
+}
+
+.dropdown {
+  width: 209px;
 }
 
 .search::before {

@@ -32,6 +32,10 @@ export default function Header({ inLoginButtonVisible }) {
 
   useEffect(() => {
     const getSearchResults = async () => {
+      if (searchValue.length === 0) {
+        setFoundUsers([]);
+        return;
+      }
       try {
         const response = await axios.get("http://localhost:8080/search-users", {
           params: { searchValue: searchValue },
@@ -79,10 +83,11 @@ export default function Header({ inLoginButtonVisible }) {
         </motion.div>
         <nav className="top-0 border-solid rounded-3xl pt-10 fixed border-b-black border-b-2 z-40 flex items-center justify-between flex-wrap p-6 header">
           <>
-            <SearchInput value={searchValue} onChange={handleSearch} />
-            {/* {foundUsers && foundUsers.length > 0
-              ? foundUsers.map((user) => <div key={user.id}>{user.name}</div>)
-              : null} */}
+            <SearchInput
+              value={searchValue}
+              onChange={handleSearch}
+              foundData={foundUsers}
+            />
             <Button label="Main page" href="/main-page" />
             <Button label="Chat" href="/chat" />
             {inLoginButtonVisible ? (

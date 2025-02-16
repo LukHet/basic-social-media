@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function SearchInput({
   id,
@@ -9,6 +10,7 @@ export default function SearchInput({
   label,
   onChange,
   value,
+  foundData,
 }) {
   return (
     <motion.div
@@ -32,6 +34,17 @@ export default function SearchInput({
         onChange={onChange}
       />
       <div className="search"></div>
+      <div className="dropdown fixed w-inherit bg-gray-50 border-gray-300 text-gray-900 text-sm rounded-lg">
+        {foundData && foundData.length > 0
+          ? foundData.map((user) => (
+              <Link href={`/profile/${user.id}`} key={user.id}>
+                <div className="px-0.5 py-2 hover:bg-sky-700 cursor-pointer">
+                  {user.name}
+                </div>
+              </Link>
+            ))
+          : null}
+      </div>
     </motion.div>
   );
 }
