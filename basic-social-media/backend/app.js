@@ -5,10 +5,14 @@ import express from "express";
 import bcrypt from "bcrypt";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { createServer } from "node:http";
 import db from "./db.js";
 import { createAuthSession, verifySession, deleteAuthSession } from "./auth.js";
+import { Server } from "socket.io";
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
 
 const corsOptions = {
   origin: "http://localhost:3000",

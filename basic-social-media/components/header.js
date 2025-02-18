@@ -65,6 +65,11 @@ export default function Header({ inLoginButtonVisible }) {
     setSearchValue(e.target.value);
   };
 
+  const handleProfileInSearchClick = () => {
+    setSearchValue("");
+    setFoundUsers([]);
+  };
+
   return (
     <>
       <header className="flex justify-center">
@@ -87,6 +92,7 @@ export default function Header({ inLoginButtonVisible }) {
               value={searchValue}
               onChange={handleSearch}
               foundData={foundUsers}
+              handleProfileInSearchClick={handleProfileInSearchClick}
             />
             <Button label="Main page" href="/main-page" />
             <Button label="Chat" href="/chat" />

@@ -15,11 +15,12 @@
     "@oslojs/encoding": "^1.1.0",
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^9.4.3",
-    "lucia": "^3.2.2",
     "cookie": "^1.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "lucia": "^3.2.2",
+    "socket.io": "^4.8.1",
     "uuid": "^11.0.3"
   }
 }

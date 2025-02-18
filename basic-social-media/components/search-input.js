@@ -11,6 +11,7 @@ export default function SearchInput({
   onChange,
   value,
   foundData,
+  handleProfileInSearchClick,
 }) {
   return (
     <motion.div
@@ -37,9 +38,13 @@ export default function SearchInput({
       <div className="dropdown fixed w-inherit bg-gray-50 border-gray-300 text-gray-900 text-sm rounded-lg">
         {foundData && foundData.length > 0
           ? foundData.map((user) => (
-              <Link href={`/profile/${user.id}`} key={user.id}>
+              <Link
+                href={`/profile/${user.id}`}
+                key={user.id}
+                onClick={handleProfileInSearchClick}
+              >
                 <div className="px-0.5 py-2 hover:bg-sky-700 cursor-pointer">
-                  {user.name}
+                  {user.name + " " + user.surname}
                 </div>
               </Link>
             ))

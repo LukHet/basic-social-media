@@ -30,7 +30,11 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
   return (
     <div className="mt-10 posts max-w-screen-sm mx-auto p-2 rounded-2xl">
       <h1 className="text-center font-bold">
-        {isOwnProfile ? "Your posts:" : "Profiles posts:"}
+        {posts.length !== 0
+          ? isOwnProfile
+            ? "Your posts:"
+            : "Profiles posts:"
+          : "No profile posts found!"}
       </h1>
       {posts.length !== 0 &&
         posts.map((post) => <Post post={post} key={post.id} />)}
