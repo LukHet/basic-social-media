@@ -31,7 +31,7 @@ app.get("/user-data", (req, res) => {
   const foundUserId = parseInt(foundSession?.user_id);
   const foundUserData = db
     .prepare(
-      "SELECT email, name, surname, birthdate, gender, city, country FROM users WHERE id = ?"
+      "SELECT email, name, surname, birthdate, gender, city, country, id FROM users WHERE id = ?"
     )
     .get(foundUserId);
   res.json(foundUserData);
@@ -50,6 +50,18 @@ app.get("/verify-user", verifySession, (req, res) => {
   res
     .status(200)
     .json({ message: "Welcome to the main page", userId: req.userId });
+});
+
+app.get("/all-users", verifySession, (req, res) => {
+  const { userId } = req;
+  try {
+    const allUsers = db
+      .prepare("SELECT name, surname, id FROM users WHERE NOT id = ?")
+      .all(userId);
+    res.status(200).json(allUsers);
+  } catch (err) {
+    res.status(404).send("Couldn't get users");
+  }
 });
 
 app.get("/user-logout", async (req, res) => {
