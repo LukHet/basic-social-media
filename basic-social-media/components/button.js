@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-export default function Button({ label, onClick, href }) {
+export default function Button({ label, onClick, href, additionalClass }) {
   return (
     <motion.button
       whileHover={{ scale: 1.1 }}
@@ -11,7 +11,9 @@ export default function Button({ label, onClick, href }) {
       initial={{ opacity: 0, scale: 1 }}
       animate={{ opacity: 1, scale: 1 }}
       onClick={onClick}
-      className="mt-3 button rounded-lg max-w-30 mx-auto px-5 text-center"
+      className={`mt-3 button rounded-lg max-w-30 mx-auto px-5 text-center ${
+        additionalClass || ""
+      }`}
     >
       {href ? <Link href={href}>{label}</Link> : label}
     </motion.button>
