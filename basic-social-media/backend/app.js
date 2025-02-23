@@ -10,18 +10,31 @@ import db from "./db.js";
 import { createAuthSession, verifySession, deleteAuthSession } from "./auth.js";
 import { Server } from "socket.io";
 
-const app = express();
-const server = createServer(app);
-const io = new Server(server);
-
 const corsOptions = {
   origin: "http://localhost:3000",
   credentials: true,
 };
 
+const app = express();
+const server = createServer(app);
+const io = new Server(server, { cors: corsOptions });
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+
+io.on("connection", (socket) => {
+  console.log("socket io has been connected ", socket);
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected", socket.id);
+  });
+});
+
+const PORT = process.env.PORT || 8081;
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
 
 app.get("/user-data", (req, res) => {
   const authSessionFound = req.cookies.auth_session;
