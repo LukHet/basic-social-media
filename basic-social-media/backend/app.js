@@ -24,8 +24,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 io.on("connection", (socket) => {
-  console.log("socket io has been connected ", socket);
-
+  socket.on("send", (value) => {
+    console.log("message has been received", value);
+  });
   socket.on("disconnect", () => {
     console.log("User disconnected", socket.id);
   });
