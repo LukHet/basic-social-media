@@ -24,6 +24,10 @@ function initDb() {
   db.prepare(
     "CREATE TABLE IF NOT EXISTS sessions (id TEXT NOT NULL PRIMARY KEY, expires_at INTEGER NOT NULL, user_id INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id))"
   ).run();
+
+  db.prepare(
+    "CREATE TABLE IF NOT EXISTS messages (id TEXT NOT NULL PRIMARY KEY, receiver_id INTEGER NOT NULL, sender_id INTEGER NOT NULL, content TEXT, message_date DATE, FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE)"
+  ).run();
 }
 
 initDb();

@@ -275,6 +275,32 @@ app.get("/other-user-data", verifySession, async (req, res) => {
   return res.status(200).json(foundUserData);
 });
 
+app.get("/chat-messages", verifySession, async (req, res) => {
+  const { receiverId, senderId } = req.query;
+  try {
+    const foundMessages = db
+      .prepare("SELECT * FROM messages WHERE receiver_id = ? AND sender_id = ?")
+      .get(receiverId, senderId);
+    return res.status(200).json(foundMessages);
+  } catch (err) {
+    return res.status(404).json({ message: "Couldn't get chat messages" });
+  }
+});
+
+app.post("/send-message", verifySession, async (req, res) => {
+  const { receiverId, senderId, content, messageDate } = req.query;
+  try {
+    const newMessage = db
+      .prepare(
+        "INSERT INTO messages (receiver_id, sender_id, content, message_date) VALUES (?, ?, ?, ?)"
+      )
+      .run(receiverId, senderId, content, messageDate);
+    return res.status(200).json({ message: "Message has been sent" });
+  } catch (err) {
+    return res.status(404).json({ message: "Couldn't get send the message" });
+  }
+});
+
 app.post("/user-register", async (req, res) => {
   const { name, surname, email, password, birthdate, gender, country, city } =
     req.body;
