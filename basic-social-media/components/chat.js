@@ -4,15 +4,18 @@ import TextInput from "./text-input";
 import Button from "./button";
 import { useEffect, useState } from "react";
 import { socket } from "@/app/socket";
+import axios from "axios";
 
 export default function Chat({ chatParameters }) {
   const [isConnected, setIsConnected] = useState(false);
   const [message, setMessage] = useState("");
   const [transport, setTransport] = useState("N/A");
+  const [allMessages, setAllMessages] = useState([]);
   const senderId = chatParameters.slug.split("-")[0];
   const receiverId = chatParameters.slug.split("-")[1];
 
   useEffect(() => {
+    getMessages();
     const onConnect = () => {
       setIsConnected(true);
       setTransport(socket.io.engine.transport.name);
@@ -47,15 +50,55 @@ export default function Chat({ chatParameters }) {
     };
   }, []);
 
+  const getMessages = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/chat-messages", {
+        params: { senderId: senderId, receiverId: receiverId },
+        withCredentials: true,
+      });
+      console.log("getting messages");
+      console.log(response);
+      setAllMessages(response?.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const sendMessage = async (commentId) => {
+    const currentDate = new Date();
+    const formattedCurrentDate = currentDate
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/send-message",
+        {
+          receiverId: receiverId,
+          senderId: senderId,
+          content: message,
+          messageDate: formattedCurrentDate,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      await getMessages();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleMessageChange = (e) => {
     setMessage(e.target.value);
   };
 
-  const handleSendClick = () => {
+  const handleSendClick = async () => {
     if (message.trim()) {
       socket.emit("send", { senderId, receiverId, message });
       setMessage("");
     }
+    await sendMessage();
   };
 
   return (

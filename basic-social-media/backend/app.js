@@ -280,7 +280,7 @@ app.get("/chat-messages", verifySession, async (req, res) => {
   try {
     const foundMessages = db
       .prepare("SELECT * FROM messages WHERE receiver_id = ? AND sender_id = ?")
-      .get(receiverId, senderId);
+      .all(receiverId, senderId);
     return res.status(200).json(foundMessages);
   } catch (err) {
     return res.status(404).json({ message: "Couldn't get chat messages" });
@@ -288,7 +288,7 @@ app.get("/chat-messages", verifySession, async (req, res) => {
 });
 
 app.post("/send-message", verifySession, async (req, res) => {
-  const { receiverId, senderId, content, messageDate } = req.query;
+  const { receiverId, senderId, content, messageDate } = req.body;
   try {
     const newMessage = db
       .prepare(
@@ -297,7 +297,7 @@ app.post("/send-message", verifySession, async (req, res) => {
       .run(receiverId, senderId, content, messageDate);
     return res.status(200).json({ message: "Message has been sent" });
   } catch (err) {
-    return res.status(404).json({ message: "Couldn't get send the message" });
+    return res.status(404).json({ message: err });
   }
 });
 

@@ -26,7 +26,7 @@ function initDb() {
   ).run();
 
   db.prepare(
-    "CREATE TABLE IF NOT EXISTS messages (id TEXT NOT NULL PRIMARY KEY, receiver_id INTEGER NOT NULL, sender_id INTEGER NOT NULL, content TEXT, message_date DATE, FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE)"
+    "CREATE TABLE IF NOT EXISTS messages (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, receiver_id INTEGER NOT NULL, sender_id INTEGER NOT NULL, content TEXT, message_date DATE, FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE)"
   ).run();
 }
 
