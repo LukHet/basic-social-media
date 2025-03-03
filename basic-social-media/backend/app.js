@@ -279,8 +279,11 @@ app.get("/chat-messages", verifySession, async (req, res) => {
   const { receiverId, senderId } = req.query;
   try {
     const foundMessages = db
-      .prepare("SELECT * FROM messages WHERE receiver_id = ? AND sender_id = ?")
-      .all(receiverId, senderId);
+      .prepare(
+        "SELECT * FROM messages WHERE (receiver_id = ? AND sender_id = ?) OR (receiver_id = ? AND sender_id = ?)"
+      )
+      .all(receiverId, senderId, senderId, receiverId);
+
     return res.status(200).json(foundMessages);
   } catch (err) {
     return res.status(404).json({ message: "Couldn't get chat messages" });

@@ -107,6 +107,23 @@ export default function Chat({ chatParameters }) {
         <p className="text-center font-bold">
           {isConnected ? "Connected to chat!" : "Couldn't connect to chat"}
         </p>
+        <div className="overflow-y-auto h-[70vh] flex flex-col">
+          {allMessages && allMessages.length > 0
+            ? allMessages.map((mess) => (
+                <div
+                  key={mess.id}
+                  className={`button p-3 m-2 w-fit rounded-3xl ${
+                    mess.sender_id === Number(senderId)
+                      ? "text-end ml-auto"
+                      : "text-start mr-auto"
+                  }`}
+                >
+                  <p className="text-xs">{mess.message_date}</p>
+                  <h2 className="text-base">{mess.content}</h2>
+                </div>
+              ))
+            : null}
+        </div>
       </div>
       <div className="main-page fixed w-full max-w-screen-lg bottom-0 fixed-centered left-[50%] flex">
         <TextInput
