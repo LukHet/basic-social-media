@@ -41,7 +41,10 @@ export default function Chat({ chatParameters }) {
       console.log("received message", message);
     };
 
-    socket.on("receive", handleReceivingMessage);
+    socket.on("receive", (message) => {
+      console.log("received something ", message);
+      handleSocketMessage(message);
+    });
 
     return () => {
       socket.off("connect", onConnect);
@@ -56,11 +59,35 @@ export default function Chat({ chatParameters }) {
         params: { senderId: senderId, receiverId: receiverId },
         withCredentials: true,
       });
-      console.log("getting messages");
-      console.log(response);
       setAllMessages(response?.data);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleSocketMessage = async (message) => {
+    if (!message) return;
+    const currentDate = new Date();
+    const formattedCurrentDate = currentDate
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/send-message",
+        {
+          receiverId: message.receiverId,
+          senderId: message.senderId,
+          content: message.message,
+          messageDate: formattedCurrentDate,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      await getMessages();
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -97,8 +124,8 @@ export default function Chat({ chatParameters }) {
     if (message.trim()) {
       socket.emit("send", { senderId, receiverId, message });
       setMessage("");
+      await sendMessage();
     }
-    await sendMessage();
   };
 
   return (
@@ -107,7 +134,7 @@ export default function Chat({ chatParameters }) {
         <p className="text-center font-bold">
           {isConnected ? "Connected to chat!" : "Couldn't connect to chat"}
         </p>
-        <div className="overflow-y-auto h-[70vh] flex flex-col">
+        <div className="overflow-y-auto h-full flex flex-col">
           {allMessages && allMessages.length > 0
             ? allMessages.map((mess) => (
                 <div

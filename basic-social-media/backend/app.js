@@ -11,7 +11,15 @@ import { createAuthSession, verifySession, deleteAuthSession } from "./auth.js";
 import { Server } from "socket.io";
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: function (origin, callback) {
+    const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
+
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
 
@@ -25,8 +33,10 @@ app.use(cookieParser());
 
 io.on("connection", (socket) => {
   socket.on("send", (value) => {
-    console.log("message has been received", value);
+    console.log("message has been sent", value);
+    socket.broadcast.emit("receive", value);
   });
+
   socket.on("disconnect", () => {
     console.log("User disconnected", socket.id);
   });
