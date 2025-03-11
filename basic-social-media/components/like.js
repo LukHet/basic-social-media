@@ -56,14 +56,12 @@ export default function Like({ postId, userId }) {
   };
 
   const getLikes = async () => {
-    console.log("getting likes");
     try {
       const response = await axios.get("http://localhost:8080/get-likes", {
         params: { postId: postId },
         withCredentials: true,
       });
       setLikes(response.data);
-      console.log("likes: ", response.data);
     } catch (err) {
       console.error(err);
     }

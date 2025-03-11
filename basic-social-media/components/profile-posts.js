@@ -6,6 +6,7 @@ import Post from "./post";
 
 export default function ProfilePosts({ isOwnProfile, slug }) {
   const [posts, setPosts] = useState([]);
+  const [userId, setUserId] = useState(null);
 
   const getPosts = async () => {
     try {
@@ -23,8 +24,20 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
     }
   };
 
+  const getUserData = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/user-data", {
+        withCredentials: true,
+      });
+      setUserId(response?.data?.id);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     getPosts();
+    getUserData();
   }, []);
 
   return (
@@ -37,7 +50,7 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
           : "No profile posts found!"}
       </h1>
       {posts.length !== 0 &&
-        posts.map((post) => <Post post={post} key={post.id} />)}
+        posts.map((post) => <Post post={post} key={post.id} userId={userId} />)}
     </div>
   );
 }
