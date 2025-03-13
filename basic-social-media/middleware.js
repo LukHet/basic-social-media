@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
+import { APIURL } from "./constants/app-info";
 
 export async function middleware(request) {
   try {
     const authSessionCookie = request.cookies.get("auth_session");
 
-    const res = await axios.get("http://localhost:8080/verify-user", {
+    const res = await axios.get(APIURL + "/verify-user", {
       headers: {
         Cookie: `auth_session=${
           authSessionCookie ? authSessionCookie.value : ""

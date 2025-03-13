@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import DateInput from "@/components/date-input";
 import SelectInput from "@/components/select-input";
 import countries from "../../constants/countries.json";
+import { APIURL } from "@/constants/app-info";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -84,7 +85,7 @@ export default function RegisterPage() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/user-register",
+        APIURL + "/user-register",
         {
           name: name,
           surname: surname,

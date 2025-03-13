@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Button from "./button";
 import TextInput from "./text-input";
+import { APIURL } from "@/constants/app-info";
 
 export default function ProfileInfo({ isOwnProfile, slug }) {
   const [userInfo, setUserInfo] = useState([]);
@@ -24,10 +25,10 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
   const getUserInfo = async () => {
     try {
       const response = isOwnProfile
-        ? await axios.get("http://localhost:8080/user-data", {
+        ? await axios.get(APIURL + "/user-data", {
             withCredentials: true,
           })
-        : await axios.get("http://localhost:8080/other-user-data", {
+        : await axios.get(APIURL + "/other-user-data", {
             params: { otherUserId: slug },
             withCredentials: true,
           });
@@ -68,7 +69,7 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/update-user-data",
+        APIURL + "/update-user-data",
         {
           name: name,
           surname: surname,
@@ -222,15 +223,22 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
             <h1 className="text-center font-bold">
               {isOwnProfile ? "Your Data" : "Profiles data"}
             </h1>
-            {Object.keys(userInfo).map((key) => (
-              <div
-                key={key}
-                className="flex justify-between mx-auto border-b-2 border-black p-1 items-center"
-              >
-                <p>{key}: </p>
-                {!isEditing ? <p>{userInfo[key]}</p> : handleInputsForEdit(key)}
-              </div>
-            ))}
+            {Object.keys(userInfo).map(
+              (key) =>
+                key !== "id" && (
+                  <div
+                    key={key}
+                    className="flex justify-between mx-auto border-b-2 border-black p-1 items-center"
+                  >
+                    <p>{key}: </p>
+                    {!isEditing ? (
+                      <p>{userInfo[key]}</p>
+                    ) : (
+                      handleInputsForEdit(key)
+                    )}
+                  </div>
+                )
+            )}
           </div>
           {isOwnProfile ? (
             <>

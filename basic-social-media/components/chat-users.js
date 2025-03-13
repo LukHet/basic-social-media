@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
+import { APIURL } from "@/constants/app-info";
 
 export default function ChatUsers() {
   const [availableUsers, setAvailableUsers] = useState([]);
@@ -11,7 +12,7 @@ export default function ChatUsers() {
 
   const getAvailableUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/all-users", {
+      const response = await axios.get(APIURL + "/all-users", {
         withCredentials: true,
       });
       setAvailableUsers(response?.data);
@@ -22,7 +23,7 @@ export default function ChatUsers() {
 
   const getUsersId = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/user-data", {
+      const response = await axios.get(APIURL + "/user-data", {
         withCredentials: true,
       });
       setUsersId(response?.data?.id);

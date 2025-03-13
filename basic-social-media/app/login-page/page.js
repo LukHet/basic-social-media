@@ -6,6 +6,7 @@ import axios from "axios";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { APIURL } from "@/constants/app-info";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -41,7 +42,7 @@ export default function LoginPage() {
     e.preventDefault();
     await axios
       .post(
-        "http://localhost:8080/user-login",
+        APIURL + "/user-login",
         {
           email: email,
           password: password,

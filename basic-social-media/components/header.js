@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SearchInput from "./search-input";
+import { APIURL } from "@/constants/app-info";
 
 export default function Header({ inLoginButtonVisible }) {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function Header({ inLoginButtonVisible }) {
   useEffect(() => {
     const userData = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/user-data", {
+        const response = await axios.get(APIURL + "/user-data", {
           withCredentials: true,
         });
         const foundName = response.data.name;
@@ -37,7 +38,7 @@ export default function Header({ inLoginButtonVisible }) {
         return;
       }
       try {
-        const response = await axios.get("http://localhost:8080/search-users", {
+        const response = await axios.get(APIURL + "/search-users", {
           params: { searchValue: searchValue },
           withCredentials: true,
         });
@@ -52,7 +53,7 @@ export default function Header({ inLoginButtonVisible }) {
 
   const logout = async () => {
     await axios
-      .get("http://localhost:8080/user-logout", {
+      .get(APIURL + "/user-logout", {
         withCredentials: true,
       })
       .then((res) => router.push("/main-page"))

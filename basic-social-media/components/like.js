@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
 import LikesPopup from "./likes-popup";
+import { APIURL } from "@/constants/app-info";
 
 export default function Like({ postId, userId }) {
   const [imgSrc, setImgSrc] = useState("/heart.png");
@@ -25,7 +26,7 @@ export default function Like({ postId, userId }) {
     if (isLiked) {
       try {
         const response = await axios.post(
-          "http://localhost:8080/delete-like",
+          APIURL + "/delete-like",
           {
             postId: postId,
           },
@@ -42,7 +43,7 @@ export default function Like({ postId, userId }) {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/post-like",
+        APIURL + "/post-like",
         {
           postId: postId,
         },
@@ -57,7 +58,7 @@ export default function Like({ postId, userId }) {
 
   const getLikes = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/get-likes", {
+      const response = await axios.get(APIURL + "/get-likes", {
         params: { postId: postId },
         withCredentials: true,
       });

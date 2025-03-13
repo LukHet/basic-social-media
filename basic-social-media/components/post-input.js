@@ -5,6 +5,7 @@ import axios from "axios";
 import TextArea from "./text-area";
 import Button from "./button";
 import Post from "./post";
+import { APIURL } from "@/constants/app-info";
 
 export default function PostInput() {
   const [postValue, setPostValue] = useState("");
@@ -14,7 +15,7 @@ export default function PostInput() {
 
   const getPosts = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/posts", {
+      const response = await axios.get(APIURL + "/posts", {
         withCredentials: true,
       });
       setPosts(response?.data);
@@ -25,7 +26,7 @@ export default function PostInput() {
 
   const getCurrentUsersId = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/user-id", {
+      const response = await axios.get(APIURL + "/user-id", {
         withCredentials: true,
       });
       setCurrentUserId(response.data);
@@ -51,7 +52,7 @@ export default function PostInput() {
       .replace("T", " ");
     try {
       const res = await axios.post(
-        "http://localhost:8080/user-post",
+        APIURL + "/user-post",
         {
           content: postValue,
           post_date: formattedCurrentDate,
@@ -71,7 +72,7 @@ export default function PostInput() {
   const deletePost = async (post_id) => {
     try {
       const res = await axios.post(
-        "http://localhost:8080/delete-post",
+        APIURL + "/delete-post",
         {
           postId: post_id,
         },

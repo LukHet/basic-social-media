@@ -5,6 +5,7 @@ import TextInput from "./text-input";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import PostComments from "./post-comments";
+import { APIURL } from "@/constants/app-info";
 
 export default function Comment({ postId, userId }) {
   const [comment, setComment] = useState("");
@@ -20,7 +21,7 @@ export default function Comment({ postId, userId }) {
 
   const getPostComments = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/get-comments", {
+      const res = await axios.get(APIURL + "/get-comments", {
         params: { postId: postId },
         withCredentials: true,
       });
@@ -31,7 +32,7 @@ export default function Comment({ postId, userId }) {
   const deleteComment = async (commentId) => {
     try {
       const res = await axios.post(
-        "http://localhost:8080/delete-comment",
+        APIURL + "/delete-comment",
         {
           commentId: commentId,
         },
@@ -51,7 +52,7 @@ export default function Comment({ postId, userId }) {
       .replace("T", " ");
     try {
       const res = await axios.post(
-        "http://localhost:8080/post-comment",
+        APIURL + "/post-comment",
         {
           content: comment,
           postId: postId,

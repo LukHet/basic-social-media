@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Post from "./post";
+import { APIURL } from "@/constants/app-info";
 
 export default function ProfilePosts({ isOwnProfile, slug }) {
   const [posts, setPosts] = useState([]);
@@ -11,10 +12,10 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
   const getPosts = async () => {
     try {
       const response = isOwnProfile
-        ? await axios.get("http://localhost:8080/user-posts", {
+        ? await axios.get(APIURL + "/user-posts", {
             withCredentials: true,
           })
-        : await axios.get("http://localhost:8080/other-user-posts", {
+        : await axios.get(APIURL + "/other-user-posts", {
             params: { otherUserId: slug },
             withCredentials: true,
           });
@@ -26,7 +27,7 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
 
   const getUserData = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/user-data", {
+      const response = await axios.get(APIURL + "/user-data", {
         withCredentials: true,
       });
       setUserId(response?.data?.id);
