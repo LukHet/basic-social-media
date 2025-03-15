@@ -3,14 +3,16 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
-import LikesPopup from "./likes-popup";
+import LikesTooltip from "./likes-popup";
 import { APIURL } from "@/constants/app-info";
+import PostLikesPopup from "./post-likes-popup";
 
 export default function Like({ postId, userId }) {
   const [imgSrc, setImgSrc] = useState("/heart.png");
   const [likes, setLikes] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
 
   const setImgToLiked = () => {
     if (isLiked) return;
@@ -69,11 +71,19 @@ export default function Like({ postId, userId }) {
   };
 
   const handleMouseOverNumber = () => {
-    setShowPopup(true);
+    setShowTooltip(true);
   };
 
   const handleMouseNotOverNumber = () => {
-    setShowPopup(false);
+    setShowTooltip(false);
+  };
+
+  const handleLikesClick = () => {
+    setPopupOpen(true);
+  };
+
+  const handlePopupClose = () => {
+    setPopupOpen(false);
   };
 
   useEffect(() => {
@@ -104,11 +114,16 @@ export default function Like({ postId, userId }) {
       <div
         onMouseEnter={handleMouseOverNumber}
         onMouseLeave={handleMouseNotOverNumber}
+        onClick={handleLikesClick}
+        className="cursor-pointer"
       >
         <p className="text-xl">Likes: {likes ? likes.length : 0}</p>
       </div>
       {likes && likes.length ? (
-        <LikesPopup likes={likes} showPopup={showPopup} />
+        <LikesTooltip likes={likes} showTooltip={showTooltip} />
+      ) : null}
+      {likes && likes.length && popupOpen ? (
+        <PostLikesPopup likes={likes} closePopup={handlePopupClose} />
       ) : null}
     </div>
   );
