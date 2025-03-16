@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import DateInput from "@/components/date-input";
 import SelectInput from "@/components/select-input";
 import countries from "../../constants/countries.json";
-import { APIURL } from "@/constants/app-info";
+import { APIURL, MAX_STRING_LENGTH, EMAIL_REGEX } from "@/constants/app-info";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -28,27 +28,24 @@ export default function RegisterPage() {
     setCountriesArray(countries.map((item) => item.country));
   }, []);
 
-  const emailRegex =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
   const onButtonClick = async (e) => {
     setErrorMessages([]);
 
-    if (!email || !emailRegex.test(email)) {
+    if (!email || !EMAIL_REGEX.test(email)) {
       setErrorMessages((prevErrorMessages) => [
         ...prevErrorMessages,
         "Provide valid email address!",
       ]);
     }
 
-    if (name.length === 0) {
+    if (name.length === 0 || name.length > MAX_STRING_LENGTH) {
       setErrorMessages((prevErrorMessages) => [
         ...prevErrorMessages,
         "Provide valid name!",
       ]);
     }
 
-    if (surname.length === 0) {
+    if (surname.length === 0 || surname.length > MAX_STRING_LENGTH) {
       setErrorMessages((prevErrorMessages) => [
         ...prevErrorMessages,
         "Provide valid surname!",
@@ -62,7 +59,7 @@ export default function RegisterPage() {
       ]);
     }
 
-    if (city.length === 0) {
+    if (city.length === 0 || city.length > MAX_STRING_LENGTH) {
       setErrorMessages((prevErrorMessages) => [
         ...prevErrorMessages,
         "Provide valid city!",

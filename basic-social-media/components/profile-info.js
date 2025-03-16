@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Button from "./button";
 import TextInput from "./text-input";
-import { APIURL } from "@/constants/app-info";
+import { APIURL, MAX_STRING_LENGTH, EMAIL_REGEX } from "@/constants/app-info";
+import DateInput from "./date-input";
 
 export default function ProfileInfo({ isOwnProfile, slug }) {
   const [userInfo, setUserInfo] = useState([]);
@@ -19,8 +20,6 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
   const [errorMessages, setErrorMessages] = useState([]);
   const [updateInfo, setUpdateInfo] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const emailRegex =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
   const getUserInfo = async () => {
     try {
@@ -41,15 +40,15 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
   const updateUserInfo = async (e) => {
     let newErrorMessages = [];
 
-    if (!mail || !emailRegex.test(mail)) {
+    if (!mail || !EMAIL_REGEX.test(mail)) {
       newErrorMessages.push("Provide valid email address!");
     }
 
-    if (name.length === 0) {
+    if (name.length === 0 || name.length > MAX_STRING_LENGTH) {
       newErrorMessages.push("Provide valid name!");
     }
 
-    if (surname.length === 0) {
+    if (surname.length === 0 || surname.length > MAX_STRING_LENGTH) {
       newErrorMessages.push("Provide valid surname!");
     }
 
@@ -57,7 +56,7 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
       newErrorMessages.push("Provide valid birthdate!");
     }
 
-    if (city.length === 0) {
+    if (city.length === 0 || city.length > MAX_STRING_LENGTH) {
       newErrorMessages.push("Provide valid city!");
     }
 
@@ -180,7 +179,7 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
         );
       case "birthdate":
         return (
-          <TextInput
+          <DateInput
             key={key}
             value={birthdate}
             onChange={(e) => handleBirthdateChange(e)}

@@ -6,7 +6,7 @@ import axios from "axios";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { APIURL } from "@/constants/app-info";
+import { APIURL, EMAIL_REGEX } from "@/constants/app-info";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,13 +14,10 @@ export default function LoginPage() {
   const [errorMessages, setErrorMessages] = useState([]);
   const router = useRouter();
 
-  const emailRegex =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
   const onButtonClick = async (e) => {
     setErrorMessages([]);
 
-    if (!email || !emailRegex.test(email)) {
+    if (!email || !EMAIL_REGEX.test(email)) {
       setErrorMessages((prevErrorMessages) => [
         ...prevErrorMessages,
         "Provide valid email address!",
