@@ -8,7 +8,12 @@ import { useRouter } from "next/navigation";
 import DateInput from "@/components/date-input";
 import SelectInput from "@/components/select-input";
 import countries from "../../constants/countries.json";
-import { APIURL, MAX_STRING_LENGTH, EMAIL_REGEX } from "@/constants/app-info";
+import {
+  APIURL,
+  MAX_STRING_LENGTH,
+  EMAIL_REGEX,
+  GENDER_OPTIONS,
+} from "@/constants/app-info";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -22,7 +27,6 @@ export default function RegisterPage() {
   const [countriesArray, setCountriesArray] = useState([]);
   const [errorMessages, setErrorMessages] = useState([]);
   const router = useRouter();
-  const GENDER_OPTIONS = ["man", "female", "other"];
 
   useEffect(() => {
     setCountriesArray(countries.map((item) => item.country));

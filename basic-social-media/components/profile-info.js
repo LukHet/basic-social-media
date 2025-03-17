@@ -4,8 +4,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Button from "./button";
 import TextInput from "./text-input";
-import { APIURL, MAX_STRING_LENGTH, EMAIL_REGEX } from "@/constants/app-info";
+import {
+  APIURL,
+  MAX_STRING_LENGTH,
+  EMAIL_REGEX,
+  GENDER_OPTIONS,
+} from "@/constants/app-info";
 import DateInput from "./date-input";
+import SelectInput from "./select-input";
+import countries from "@/constants/countries.json";
 
 export default function ProfileInfo({ isOwnProfile, slug }) {
   const [userInfo, setUserInfo] = useState([]);
@@ -20,6 +27,11 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
   const [errorMessages, setErrorMessages] = useState([]);
   const [updateInfo, setUpdateInfo] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [countriesArray, setCountriesArray] = useState([]);
+
+  useEffect(() => {
+    setCountriesArray(countries.map((item) => item.country));
+  }, []);
 
   const getUserInfo = async () => {
     try {
@@ -187,8 +199,9 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
         );
       case "gender":
         return (
-          <TextInput
+          <SelectInput
             key={key}
+            options={GENDER_OPTIONS}
             value={gender}
             onChange={(e) => handleGenderChange(e)}
           />
@@ -203,7 +216,8 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
         );
       case "country":
         return (
-          <TextInput
+          <SelectInput
+            options={countriesArray}
             key={key}
             value={country}
             onChange={(e) => handleCountryChange(e)}

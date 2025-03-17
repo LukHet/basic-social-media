@@ -18,7 +18,7 @@ export default function PostLikesPopup({ closePopup, likes }) {
               <Link
                 key={el.id}
                 href={`/profile/${el.user_id}`}
-                className="button border-black border-2 p-1 rounded-xl post-author w-fit flex gap-2 align-center pt-2"
+                className="button border-black border-2 p-1 my-2 rounded-xl post-author w-fit flex gap-2 align-center pt-2"
               >
                 {el.author}
               </Link>

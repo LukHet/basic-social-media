@@ -48,7 +48,7 @@ export default function SearchInput({
                 </div>
               </Link>
             ))
-          : null}
+          : value.length > 0 && <div className="px-0.5 py-2">No results</div>}
       </div>
     </motion.div>
   );
