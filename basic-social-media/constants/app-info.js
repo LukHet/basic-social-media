@@ -10,3 +10,5 @@ export const MAX_AGE = 120;
 export const MIN_AGE = 15;
 
 export const GENDER_OPTIONS = ["man", "female", "other"];
+
+export const MAX_POST_LENGTH = 500;

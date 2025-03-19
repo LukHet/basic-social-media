@@ -5,13 +5,14 @@ import axios from "axios";
 import TextArea from "./text-area";
 import Button from "./button";
 import Post from "./post";
-import { APIURL } from "@/constants/app-info";
+import { APIURL, MAX_POST_LENGTH } from "@/constants/app-info";
 
 export default function PostInput() {
   const [postValue, setPostValue] = useState("");
   const [postInfo, setPostInfo] = useState("");
   const [posts, setPosts] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [postLength, setPostLength] = useState(0);
 
   const getPosts = async () => {
     try {
@@ -41,7 +42,9 @@ export default function PostInput() {
   }, []);
 
   const onPostValueChange = (e) => {
+    if (e.target.value.length >= MAX_POST_LENGTH + 1) return;
     setPostValue(e.target.value);
+    setPostLength(e.target.value.length);
   };
 
   const sendNewPost = async () => {
@@ -93,7 +96,16 @@ export default function PostInput() {
           value={postValue}
           onChange={onPostValueChange}
         />
-        <Button label="Publish" onClick={sendNewPost} />
+        <div className="flex justify-between items-center">
+          <Button
+            label="Publish"
+            onClick={sendNewPost}
+            additionalClass="!mx-1"
+          />
+          <p>
+            {postLength} / {MAX_POST_LENGTH}
+          </p>
+        </div>
         <p className="mt-2">{postInfo}</p>
       </div>
       {posts.map((post) => (
