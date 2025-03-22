@@ -1,7 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
 
-export default function PostComments({ comments, userId, deleteComment }) {
+export default function PostComments({
+  comments,
+  userId,
+  deleteComment,
+  isOwnPost,
+}) {
   const allComments =
     comments.length > 0 ? (
       comments.map((com) => (
@@ -15,7 +20,7 @@ export default function PostComments({ comments, userId, deleteComment }) {
             </Link>
             <div className="flex h-fit items-center">
               <p>{com.comment_date}</p>
-              {com.user_id === userId ? (
+              {com.user_id === userId || isOwnPost ? (
                 <Image
                   className="ml-3 bin"
                   src="/bin.png"

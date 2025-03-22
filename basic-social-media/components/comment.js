@@ -7,7 +7,7 @@ import axios from "axios";
 import PostComments from "./post-comments";
 import { APIURL } from "@/constants/app-info";
 
-export default function Comment({ postId, userId }) {
+export default function Comment({ postId, userId, isOwnPost }) {
   const [comment, setComment] = useState("");
   const [postComments, setPostComments] = useState([]);
 
@@ -81,6 +81,7 @@ export default function Comment({ postId, userId }) {
         comments={postComments}
         userId={userId}
         deleteComment={deleteComment}
+        isOwnPost={isOwnPost}
       />
     </div>
   );
