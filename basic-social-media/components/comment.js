@@ -5,11 +5,12 @@ import TextInput from "./text-input";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import PostComments from "./post-comments";
-import { APIURL } from "@/constants/app-info";
+import { APIURL, MAX_COMMENT_LENGTH } from "@/constants/app-info";
 
 export default function Comment({ postId, userId, isOwnPost }) {
   const [comment, setComment] = useState("");
   const [postComments, setPostComments] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     getPostComments();
@@ -45,6 +46,10 @@ export default function Comment({ postId, userId, isOwnPost }) {
   };
 
   const postComment = async () => {
+    setErrorMessage("");
+    if (comment.length > MAX_COMMENT_LENGTH) {
+      setErrorMessage("Provided comment was too long");
+    }
     const currentDate = new Date();
     const formattedCurrentDate = currentDate
       .toISOString()
@@ -64,7 +69,9 @@ export default function Comment({ postId, userId, isOwnPost }) {
       );
       await getPostComments();
       setComment("");
-    } catch (err) {}
+    } catch (err) {
+      setErrorMessage(err);
+    }
   };
   return (
     <div className="max-w-[100%] mt-5">
@@ -76,6 +83,7 @@ export default function Comment({ postId, userId, isOwnPost }) {
           value={comment}
         />
         <Button label="Post comment" onClick={postComment} />
+        <p className="text-red-500">{errorMessage}</p>
       </div>
       <PostComments
         comments={postComments}

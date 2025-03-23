@@ -1,5 +1,9 @@
 export const APIURL = "http://localhost:8080";
 
+export const LOCALHOST_URL = "http://localhost:3000";
+
+export const TEST_LOCALHOST_URL = "http://localhost:3001";
+
 export const MAX_STRING_LENGTH = 70;
 
 export const EMAIL_REGEX =
@@ -12,3 +16,5 @@ export const MIN_AGE = 15;
 export const GENDER_OPTIONS = ["man", "female", "other"];
 
 export const MAX_POST_LENGTH = 500;
+
+export const MAX_COMMENT_LENGTH = 300;

@@ -9,10 +9,16 @@ import { createServer } from "node:http";
 import db from "./db.js";
 import { createAuthSession, verifySession, deleteAuthSession } from "./auth.js";
 import { Server } from "socket.io";
+import {
+  MAX_STRING_LENGTH,
+  LOCALHOST_URL,
+  TEST_LOCALHOST_URL,
+  EMAIL_REGEX,
+} from "@/constants/app-info.js";
 
 const corsOptions = {
   origin: function (origin, callback) {
-    const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
+    const allowedOrigins = [LOCALHOST_URL, TEST_LOCALHOST_URL];
 
     if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true);
@@ -110,6 +116,12 @@ app.get("/user-logout", async (req, res) => {
 app.post("/user-post", verifySession, async (req, res) => {
   const { content, post_date } = req.body;
   const { userId } = req;
+
+  if (content.length === 0 || content.length > MAX_STRING_LENGTH) {
+    return res
+      .status(400)
+      .json({ message: "Provided post content has incorrect length" });
+  }
 
   const postContent = content;
   const foundUserId = userId;
@@ -238,6 +250,12 @@ app.post("/post-comment", verifySession, async (req, res) => {
   const { postId, content, comment_date } = req.body;
   const { userId } = req;
 
+  if (content.length === 0 || !content || content.length > MAX_COMMENT_LENGTH) {
+    return res
+      .status(404)
+      .json({ message: "Provided comment is too long or doesn't exist" });
+  }
+
   try {
     const foundUserData = db
       .prepare("SELECT name, surname FROM users WHERE id = ?")
@@ -320,6 +338,34 @@ app.post("/user-register", async (req, res) => {
 
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
+  }
+
+  if (!EMAIL_REGEX.test(email)) {
+    return res.status(400).json({ message: "Provided email is incorrect" });
+  }
+
+  if (password.length < 8 || password.length > 64) {
+    return res.status(400).json({
+      message:
+        "Password should be longer than 8 characters and shorter than 64 characters.",
+    });
+  }
+
+  if (
+    !surname ||
+    surname.length > MAX_STRING_LENGTH ||
+    surname.length === 0 ||
+    !birthdate ||
+    !gender ||
+    !country ||
+    !city ||
+    city.length > MAX_STRING_LENGTH ||
+    city.length === 0
+  ) {
+    return res.status(400).json({
+      message:
+        "One of the mandatory fields is empty or incorrect, please fill your data.",
+    });
   }
 
   const saltRounds = 10;
