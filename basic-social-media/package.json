@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "type": "module",
   "dependencies": {
     "@lucia-auth/adapter-sqlite": "^3.0.2",
     "@next/font": "^14.2.15",

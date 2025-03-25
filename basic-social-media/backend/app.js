@@ -10,11 +10,11 @@ import db from "./db.js";
 import { createAuthSession, verifySession, deleteAuthSession } from "./auth.js";
 import { Server } from "socket.io";
 import {
-  MAX_STRING_LENGTH,
   LOCALHOST_URL,
   TEST_LOCALHOST_URL,
+  MAX_STRING_LENGTH,
   EMAIL_REGEX,
-} from "@/constants/app-info.js";
+} from "../constants/app-info.js";
 
 const corsOptions = {
   origin: function (origin, callback) {
