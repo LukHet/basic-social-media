@@ -293,6 +293,56 @@ app.post("/delete-comment", verifySession, async (req, res) => {
   }
 });
 
+app.post("/comment-like", verifySession, async (req, res) => {
+  const { commentId } = req.body;
+  const { userId } = req;
+  try {
+    const foundUserData = db
+      .prepare("SELECT name, surname FROM users WHERE id = ?")
+      .get(userId);
+
+    const author = foundUserData.name + " " + foundUserData.surname;
+
+    const commentLiked = db
+      .prepare("INSERT INTO comment-likes (user_id, comment_id) VALUES (?, ?)")
+      .run(userId, commentId);
+
+    return res.status(200).json({ message: "Comment has been liked!" });
+  } catch (err) {
+    return res
+      .status(404)
+      .json({ message: "Couldn't like the comment: ", err });
+  }
+});
+
+app.post("/delete-comment-like", verifySession, async (req, res) => {
+  const { commentId } = req.body;
+  const { userId } = req;
+  try {
+    const deleteLiked = db
+      .prepare("DELETE FROM comment-likes WHERE user_id=? AND comment_id=?")
+      .run(userId, commentId);
+
+    return res.status(200).json({ message: "Comment has been unliked!" });
+  } catch (err) {
+    return res
+      .status(404)
+      .json({ message: "Couldn't unlike the comment: ", err });
+  }
+});
+
+app.get("/get-comment-likes", verifySession, async (req, res) => {
+  const { commentId } = req.query;
+  try {
+    const likes = db
+      .prepare("SELECT * from comment-likes WHERE comment_id = ?")
+      .all(commentId);
+    return res.status(200).json(likes);
+  } catch (err) {
+    return res.status(404).json({ message: "Couldn't get likes: ", err });
+  }
+});
+
 app.get("/other-user-data", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
   const foundUserData = db
