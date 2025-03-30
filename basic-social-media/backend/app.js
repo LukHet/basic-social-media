@@ -14,6 +14,7 @@ import {
   TEST_LOCALHOST_URL,
   MAX_STRING_LENGTH,
   EMAIL_REGEX,
+  MAX_COMMENT_LENGTH,
 } from "../constants/app-info.js";
 
 const corsOptions = {
@@ -304,7 +305,7 @@ app.post("/comment-like", verifySession, async (req, res) => {
     const author = foundUserData.name + " " + foundUserData.surname;
 
     const commentLiked = db
-      .prepare("INSERT INTO comment-likes (user_id, comment_id) VALUES (?, ?)")
+      .prepare("INSERT INTO comment_likes (user_id, comment_id) VALUES (?, ?)")
       .run(userId, commentId);
 
     return res.status(200).json({ message: "Comment has been liked!" });
@@ -320,7 +321,7 @@ app.post("/delete-comment-like", verifySession, async (req, res) => {
   const { userId } = req;
   try {
     const deleteLiked = db
-      .prepare("DELETE FROM comment-likes WHERE user_id=? AND comment_id=?")
+      .prepare("DELETE FROM comment_likes WHERE user_id=? AND comment_id=?")
       .run(userId, commentId);
 
     return res.status(200).json({ message: "Comment has been unliked!" });
@@ -335,7 +336,7 @@ app.get("/get-comment-likes", verifySession, async (req, res) => {
   const { commentId } = req.query;
   try {
     const likes = db
-      .prepare("SELECT * from comment-likes WHERE comment_id = ?")
+      .prepare("SELECT * from comment_likes WHERE comment_id = ?")
       .all(commentId);
     return res.status(200).json(likes);
   } catch (err) {

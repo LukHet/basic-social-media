@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import CommentLike from "./comment-like";
 
 export default function PostComments({
   comments,
@@ -33,6 +34,9 @@ export default function PostComments({
             </div>
           </div>
           <p className="mt-2">{com.content}</p>
+          <div className="mt-3">
+            <CommentLike commentId={com.id} userId={userId} />
+          </div>
         </div>
       ))
     ) : (
