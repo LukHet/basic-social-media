@@ -2,6 +2,7 @@
 
 import Button from "./button";
 import axios from "axios";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -74,20 +75,7 @@ export default function Header({ inLoginButtonVisible }) {
   return (
     <>
       <header className="flex justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 1 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="fixed z-50 text-xl mt-2 font-bold"
-        >
-          Hello{" "}
-          <Link
-            href="/profile-page"
-            className="button border-black border-2 p-1 rounded-xl"
-          >
-            {username}
-          </Link>
-        </motion.div>
-        <nav className="top-0 border-solid rounded-3xl pt-10 fixed border-b-black border-b-2 z-40 flex items-center justify-between flex-wrap p-6 header">
+        <nav className="top-0 border-solid rounded-3xl fixed border-b-black border-b-2 z-40 flex items-center justify-between flex-wrap p-6 header">
           <>
             <SearchInput
               value={searchValue}
@@ -102,6 +90,25 @@ export default function Header({ inLoginButtonVisible }) {
             ) : (
               <Button label="Log out" onClick={logout} />
             )}
+            <motion.div
+              initial={{ opacity: 0, scale: 1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-xl mt-2 font-bold"
+            >
+              <Link
+                href="/profile-page"
+                className="button border-black border-2 p-1 rounded-xl"
+              >
+                {username}
+              </Link>
+            </motion.div>
+            <Image
+              width={42}
+              height={42}
+              alt="Profile picture"
+              src="/picture_placeholder.png"
+              className="rounded-full ml-2"
+            />
           </>
         </nav>
       </header>

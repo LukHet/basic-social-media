@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
-import LikesTooltip from "./likes-popup";
 import { APIURL } from "@/constants/app-info";
-import PostLikesPopup from "./post-likes-popup";
 
 export default function CommentLike({ commentId, userId }) {
   const [imgSrc, setImgSrc] = useState("/heart.png");

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Button from "./button";
 import TextInput from "./text-input";
+import Image from "next/image";
 import {
   APIURL,
   MAX_STRING_LENGTH,
@@ -233,6 +234,16 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
       {isLoading ? null : (
         <>
           <div className="main-page mt-28 max-w-screen-sm p-5 rounded-3xl container mx-auto">
+            <div className="flex justify-between items-center">
+              <h1 className="font-bold">Profile picture:</h1>
+              <Image
+                width={64}
+                height={64}
+                alt="Profile picture"
+                src="/picture_placeholder.png"
+                className="rounded-full"
+              />
+            </div>
             <h1 className="text-center font-bold">
               {isOwnProfile ? "Your Data" : "Profiles data"}
             </h1>
