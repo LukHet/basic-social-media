@@ -278,6 +278,29 @@ app.post("/post-comment", verifySession, async (req, res) => {
   }
 });
 
+app.post("/post-picture", verifySession, async (req, res) => {
+  const { userId } = req;
+  const { content } = req.body;
+
+  if (!content) {
+    return res.status(400).json({ message: "Content is required" });
+  }
+
+  try {
+    const deleteOldUserPictures = db
+      .prepare("DELETE FROM profile_pictures WHERE user_id=?")
+      .run(userId);
+
+    const pictureToPost = db
+      .prepare("INSERT INTO profile_pictures (user_id, content) VALUES (?, ?)")
+      .run(userId, content);
+
+    return res.status(200).json({ message: "Picture has been updated!" });
+  } catch (err) {
+    return res.status(500).json({ message: "Couldn't update picture: ", err });
+  }
+});
+
 app.post("/delete-comment", verifySession, async (req, res) => {
   const { commentId } = req.body;
 
