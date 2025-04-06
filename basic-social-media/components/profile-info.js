@@ -14,6 +14,7 @@ import {
 import DateInput from "./date-input";
 import SelectInput from "./select-input";
 import countries from "@/constants/countries.json";
+import PicturePopup from "./picture-popup";
 
 export default function ProfileInfo({ isOwnProfile, slug }) {
   const [userInfo, setUserInfo] = useState([]);
@@ -29,6 +30,7 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
   const [updateInfo, setUpdateInfo] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [countriesArray, setCountriesArray] = useState([]);
+  const [isPicturePopupOpened, setIsPicturePopupOpened] = useState(false);
 
   useEffect(() => {
     setCountriesArray(countries.map((item) => item.country));
@@ -229,10 +231,21 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
     }
   };
 
+  const openPicturePopup = () => {
+    setIsPicturePopupOpened(true);
+  };
+
+  const closePicturePopup = () => {
+    setIsPicturePopupOpened(false);
+  };
+
   return (
     <>
       {isLoading ? null : (
         <>
+          {isPicturePopupOpened ? (
+            <PicturePopup onClose={closePicturePopup} />
+          ) : null}
           <div className="main-page mt-28 max-w-screen-sm p-5 rounded-3xl container mx-auto">
             <div className="flex justify-between items-center">
               <h1 className="font-bold">Profile picture:</h1>
@@ -241,7 +254,8 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
                 height={64}
                 alt="Profile picture"
                 src="/picture_placeholder.png"
-                className="rounded-full"
+                className="rounded-full cursor-pointer"
+                onClick={openPicturePopup}
               />
             </div>
             <h1 className="text-center font-bold">
