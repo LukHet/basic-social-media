@@ -18,3 +18,5 @@ export const GENDER_OPTIONS = ["man", "female", "other"];
 export const MAX_POST_LENGTH = 500;
 
 export const MAX_COMMENT_LENGTH = 300;
+
+export const ALLOWED_FILE_EXTENSIONS = ["jpg", "jpeg", "png"];
