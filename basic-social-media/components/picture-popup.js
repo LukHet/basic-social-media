@@ -3,25 +3,53 @@
 import { useState } from "react";
 import FileInput from "./file-input";
 import Button from "./button";
-import { ALLOWED_FILE_EXTENSIONS } from "@/constants/app-info";
+import { ALLOWED_FILE_EXTENSIONS, APIURL } from "@/constants/app-info";
+import Image from "next/image";
+import axios from "axios";
 
 export default function PicturePopup({ onClose }) {
   const [file, setFile] = useState(null);
   const [fileSize, setFileSize] = useState(0);
   const [isUploadAllowed, setIsUploadAllowed] = useState(false);
+  const [imageURL, setImageURL] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-    setFileSize(event.target.files[0].size);
-    const fileExtension = event.target.files[0].name.split(".")[1];
+    const selectedFile = event.target.files[0];
 
-    if (ALLOWED_FILE_EXTENSIONS.includes(fileExtension)) {
-      setIsUploadAllowed(true);
+    if (!selectedFile) return;
+
+    setFile(selectedFile);
+    setFileSize(selectedFile.size);
+    const fileExtension = selectedFile.name.split(".").pop().toLowerCase();
+    const isFileAllowed = ALLOWED_FILE_EXTENSIONS.includes(fileExtension);
+    setIsUploadAllowed(isFileAllowed);
+    if (isFileAllowed) {
+      const objectUrl = URL.createObjectURL(selectedFile);
+      setImageURL(objectUrl);
+      console.log(objectUrl);
+    }
+  };
+
+  const handleUploadPicture = async () => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("content", file);
+    try {
+      const res = await axios.post(APIURL + "/post-picture", formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(res);
+    } catch (err) {
+      setErrorMessage("Couldn't upload the picture: " + err);
     }
   };
   return (
     <div className="fixed inset-0 z-50 pt-24 w-full h-full overflow-auto bg-black bg-opacity-40">
-      <div className="main-page min-w-80 h-80 rounded-3xl p-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+      <div className="main-page min-w-80 h-fit min-h-80 rounded-3xl p-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <div
           className="cursor-pointer w-fit p-1 border-2 border-black float-right relative rounded-3xl"
           onClick={onClose}
@@ -36,8 +64,25 @@ export default function PicturePopup({ onClose }) {
             handleFileChange={(e) => handleFileChange(e)}
             fileSize={fileSize}
           />
-          <div className="flex justify-center mt-5">
-            <Button label="Upload picture" disabled={!isUploadAllowed} />
+          {imageURL && (
+            <div className="relative w-full aspect-[4/3] mt-4">
+              <Image
+                src={imageURL}
+                alt="Your profile picture"
+                fill
+                className="object-contain rounded-lg"
+              />
+            </div>
+          )}
+          <div className="flex justify-center mt-5 mb-3">
+            <Button
+              label="Upload picture"
+              disabled={!isUploadAllowed}
+              onClick={() => handleUploadPicture()}
+            />
+          </div>
+          <div>
+            <p className="mt-3 max-w-80">{errorMessage}</p>
           </div>
         </div>
       </div>
