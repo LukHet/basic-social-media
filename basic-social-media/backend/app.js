@@ -287,13 +287,16 @@ app.post("/post-picture", verifySession, async (req, res) => {
   }
 
   try {
+    const base64String = content.split(",")[1];
+    const buffer = Buffer.from(base64String, "base64");
+
     const deleteOldUserPictures = db
       .prepare("DELETE FROM profile_pictures WHERE user_id=?")
       .run(userId);
 
     const pictureToPost = db
       .prepare("INSERT INTO profile_pictures (user_id, content) VALUES (?, ?)")
-      .run(userId, content);
+      .run(userId, buffer);
 
     return res.status(200).json({ message: "Picture has been updated!" });
   } catch (err) {
