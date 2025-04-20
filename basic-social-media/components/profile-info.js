@@ -31,9 +31,36 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
   const [isLoading, setIsLoading] = useState(true);
   const [countriesArray, setCountriesArray] = useState([]);
   const [isPicturePopupOpened, setIsPicturePopupOpened] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
+    let objectUrl;
+
+    const getProfilePicture = async () => {
+      try {
+        const response = await axios.get(APIURL + "/get-picture", {
+          withCredentials: true,
+        });
+        if (response?.data?.content?.data) {
+          const byteArray = new Uint8Array(response.data.content.data);
+          const blob = new Blob([byteArray]);
+          objectUrl = URL.createObjectURL(blob);
+          setProfileImage(objectUrl);
+          console.log(objectUrl);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    getProfilePicture();
     setCountriesArray(countries.map((item) => item.country));
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
   }, []);
 
   const getUserInfo = async () => {
@@ -253,7 +280,7 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
                 width={64}
                 height={64}
                 alt="Profile picture"
-                src="/picture_placeholder.png"
+                src={profileImage ? profileImage : "/picture_placeholder.png"}
                 className="rounded-full cursor-pointer"
                 onClick={openPicturePopup}
               />

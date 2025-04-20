@@ -50,6 +50,8 @@ export default function PicturePopup({ onClose }) {
           withCredentials: true,
         }
       );
+      setErrorMessage("New profile picture has been uploaded!");
+      window.location.reload();
     } catch (err) {
       setErrorMessage("Couldn't upload the picture: " + err);
     }

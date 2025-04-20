@@ -304,6 +304,20 @@ app.post("/post-picture", verifySession, async (req, res) => {
   }
 });
 
+app.get("/get-picture", verifySession, async (req, res) => {
+  const { userId } = req;
+
+  try {
+    const foundPicture = db
+      .prepare("SELECT content FROM profile_pictures WHERE user_id = ?")
+      .get(userId);
+
+    res.status(200).json(foundPicture);
+  } catch (err) {
+    res.status(404).json({ message: "Couldn't the picture: ", err });
+  }
+});
+
 app.post("/delete-comment", verifySession, async (req, res) => {
   const { commentId } = req.body;
 

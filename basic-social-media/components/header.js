@@ -15,8 +15,11 @@ export default function Header({ inLoginButtonVisible }) {
   const [username, setUsername] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [foundUsers, setFoundUsers] = useState([]);
+  const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
+    let objectUrl;
+
     const userData = async () => {
       try {
         const response = await axios.get(APIURL + "/user-data", {
@@ -29,7 +32,31 @@ export default function Header({ inLoginButtonVisible }) {
       }
     };
 
+    const getProfilePicture = async () => {
+      try {
+        const response = await axios.get(APIURL + "/get-picture", {
+          withCredentials: true,
+        });
+        if (response?.data?.content?.data) {
+          const byteArray = new Uint8Array(response.data.content.data);
+          const blob = new Blob([byteArray]);
+          objectUrl = URL.createObjectURL(blob);
+          setProfileImage(objectUrl);
+          console.log(objectUrl);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     userData();
+    getProfilePicture();
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -106,7 +133,7 @@ export default function Header({ inLoginButtonVisible }) {
               width={42}
               height={42}
               alt="Profile picture"
-              src="/picture_placeholder.png"
+              src={profileImage ? profileImage : "/picture_placeholder.png"}
               className="rounded-full ml-2"
             />
           </>
