@@ -3,7 +3,7 @@ import Comment from "./comment";
 import Like from "./like";
 import Image from "next/image";
 
-export default function Post({ post, userId, deletePost }) {
+export default function Post({ post, userId, deletePost, profileImage }) {
   const href = `/profile/${post.user_id}`;
   const isOwnPost = post.user_id === userId;
   return (
@@ -11,9 +11,15 @@ export default function Post({ post, userId, deletePost }) {
       <div className="flex justify-between">
         <Link
           href={href}
-          className="button border-black border-2 p-1 rounded-xl post-author flex gap-2 align-center pt-2"
+          className="button border-black border-2 p-1 rounded-xl flex gap-2 align-center pt-2"
         >
           {post.author}
+          <Image
+            src={profileImage ? profileImage : "/user.png"}
+            width={24}
+            height={24}
+            alt="user icon"
+          />
         </Link>
         <div className="flex h-fit items-center">
           <p>{post.post_date}</p>
