@@ -19,6 +19,7 @@ export default function Post({ post, userId, deletePost, profileImage }) {
             width={24}
             height={24}
             alt="user icon"
+            className="rounded-lg"
           />
         </Link>
         <div className="flex h-fit items-center">
