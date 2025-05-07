@@ -1,4 +1,5 @@
 import Header from "@/components/header";
+import SideBar from "@/components/sidebar";
 
 export const metadata = {
   title: "Basic social media",
@@ -11,6 +12,7 @@ export default function AuthRootLayout({ children }) {
   return (
     <>
       <Header inLoginButtonVisible={inLoginButtonVisible} />
+      <SideBar />
       {children}
     </>
   );
