@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { APIURL } from "@/constants/app-info";
 
-export default function ChatUsers() {
+export default function ChatUsers({ sidebar }) {
   const [availableUsers, setAvailableUsers] = useState([]);
   const [usersId, setUsersId] = useState(null);
 
@@ -38,13 +38,15 @@ export default function ChatUsers() {
   }, []);
 
   return (
-    <div>
+    <div className={sidebar ? "mt-20" : ""}>
       {availableUsers && availableUsers.length > 0 && usersId
         ? availableUsers.map((user) => (
             <Link
               href={`/chat/${usersId}-${user.id}`}
               key={user.id}
-              className="button border-black border-2 p-1 rounded-xl flex gap-2 align-center pt-2 w-fit m-5"
+              className={`button border-black border-2 p-1 rounded-xl flex gap-2 items-center pt-2 m-5 ${
+                sidebar ? "w-[80%]" : "w-fit"
+              }`}
             >
               {user.name} {user.surname}
               <Image

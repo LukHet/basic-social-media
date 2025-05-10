@@ -22,7 +22,7 @@ body {
   display: inline-block;
   font-size: 20px;
   position: absolute;
-  top: 20px;
+  top: 10px;
   left: 169px;
   padding: 18px 20px;
   z-index: 2;
@@ -103,11 +103,23 @@ body {
 }
 
 .sidebar {
-  transform:translateX(-60%);
+  transform: translateX(-60%);
   transition: transform 0.3s ease;
 }
 
-.sidebar:hover {
-  transform:translateX(0);
+.chat-icon {
+  position: absolute;
+  top: 5px;
+  left: 70%;
+  transition: left 0.3s ease;
 }
+
+.sidebar:hover {
+  transform: translateX(0);
+}
+
+.sidebar:hover .chat-icon {
+  left: 40%;
+}
+
 
