@@ -67,7 +67,7 @@ export default function SingleComment({
             src={profileImage && !loading ? profileImage : "/user.png"}
             width={24}
             height={24}
-            alt="user icon"
+            alt="user icon comment"
             className="rounded-lg"
           />
         </Link>

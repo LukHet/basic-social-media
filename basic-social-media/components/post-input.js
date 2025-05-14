@@ -13,8 +13,6 @@ export default function PostInput() {
   const [posts, setPosts] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [postLength, setPostLength] = useState(0);
-  const [profileImage, setProfileImage] = useState(null);
-  let objectUrl;
 
   const getPosts = async () => {
     try {
@@ -22,23 +20,6 @@ export default function PostInput() {
         withCredentials: true,
       });
       setPosts(response?.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  //change it to react query
-  const getProfilePicture = async () => {
-    try {
-      const response = await axios.get(APIURL + "/get-picture", {
-        withCredentials: true,
-      });
-      if (response?.data?.content?.data) {
-        const byteArray = new Uint8Array(response.data.content.data);
-        const blob = new Blob([byteArray]);
-        objectUrl = URL.createObjectURL(blob);
-        setProfileImage(objectUrl);
-      }
     } catch (err) {
       console.error(err);
     }
@@ -58,13 +39,6 @@ export default function PostInput() {
   useEffect(() => {
     getPosts();
     getCurrentUsersId();
-    getProfilePicture();
-
-    return () => {
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-      }
-    };
   }, []);
 
   const onPostValueChange = (e) => {
@@ -140,7 +114,6 @@ export default function PostInput() {
           key={post.id}
           deletePost={() => deletePost(post.id)}
           userId={currentUserId}
-          profileImage={profileImage}
         />
       ))}
     </>

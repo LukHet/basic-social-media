@@ -305,7 +305,7 @@ app.post("/post-picture", verifySession, async (req, res) => {
 });
 
 app.get("/get-picture", verifySession, async (req, res) => {
-  const { userId } = req;
+  const { userId } = req.query;
 
   try {
     const foundPicture = db

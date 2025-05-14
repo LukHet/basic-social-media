@@ -1,11 +1,51 @@
+"use client";
+
 import Link from "next/link";
 import Comment from "./comment";
 import Like from "./like";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { APIURL } from "@/constants/app-info";
 
-export default function Post({ post, userId, deletePost, profileImage }) {
+export default function Post({ post, userId, deletePost }) {
+  const [profileImage, setProfileImage] = useState(null);
+
   const href = `/profile/${post.user_id}`;
   const isOwnPost = post.user_id === userId;
+  let objectUrl = null;
+
+  useEffect(() => {
+    getProfilePicture();
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, []);
+
+  const getProfilePicture = async () => {
+    console.log("get profile picture");
+    console.log(post.user_id);
+    try {
+      const response = await axios.get(APIURL + "/get-picture", {
+        params: { userId: post.user_id },
+        withCredentials: true,
+      });
+      console.log(response);
+      if (response?.data?.content?.data) {
+        const byteArray = new Uint8Array(response.data.content.data);
+        const blob = new Blob([byteArray]);
+        objectUrl = URL.createObjectURL(blob);
+        console.log(objectUrl);
+        setProfileImage(objectUrl);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="main-page mt-5 max-w-screen-lg py-5 px-10 rounded-3xl container mx-auto post">
       <div className="flex justify-between">
