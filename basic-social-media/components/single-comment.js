@@ -42,6 +42,7 @@ export default function SingleComment({
   const getProfilePicture = async () => {
     try {
       const response = await axios.get(APIURL + "/get-picture", {
+        params: { userId: com.user_id },
         withCredentials: true,
       });
       if (response?.data?.content?.data) {

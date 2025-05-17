@@ -145,7 +145,7 @@ app.post("/user-post", verifySession, async (req, res) => {
 });
 
 app.get("/posts", verifySession, async (req, res) => {
-  const posts = db.prepare("SELECT * from posts").all();
+  const posts = db.prepare("SELECT * from posts ORDER BY post_date DESC").all();
   return res.status(200).json(posts);
 });
 
@@ -305,16 +305,37 @@ app.post("/post-picture", verifySession, async (req, res) => {
 });
 
 app.get("/get-picture", verifySession, async (req, res) => {
-  const { userId } = req.query;
+  const { ownPicture } = req.query;
+  let { userId } = req.query;
+
+  if (!userId && !ownPicture) {
+    return res
+      .status(400)
+      .json({ message: "Missing userId or ownPicture flag." });
+  }
+
+  if (ownPicture) {
+    userId = req.userId;
+  }
+
+  if (!userId) {
+    return res.status(404).json({ message: "Couldn't find the user." });
+  }
 
   try {
     const foundPicture = db
       .prepare("SELECT content FROM profile_pictures WHERE user_id = ?")
       .get(userId);
 
-    res.status(200).json(foundPicture);
+    if (!foundPicture) {
+      return res.status(404).json({ message: "Picture not found." });
+    }
+
+    return res.status(200).json(foundPicture);
   } catch (err) {
-    res.status(404).json({ message: "Couldn't the picture: ", err });
+    return res
+      .status(500)
+      .json({ message: "Couldn't fetch the picture.", error: err.message });
   }
 });
 

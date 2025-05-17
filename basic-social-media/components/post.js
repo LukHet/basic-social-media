@@ -26,8 +26,6 @@ export default function Post({ post, userId, deletePost }) {
   }, []);
 
   const getProfilePicture = async () => {
-    console.log("get profile picture");
-    console.log(post.user_id);
     try {
       const response = await axios.get(APIURL + "/get-picture", {
         params: { userId: post.user_id },

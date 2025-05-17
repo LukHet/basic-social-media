@@ -35,6 +35,7 @@ export default function Header({ inLoginButtonVisible }) {
     const getProfilePicture = async () => {
       try {
         const response = await axios.get(APIURL + "/get-picture", {
+          params: { ownPicture: true },
           withCredentials: true,
         });
         if (response?.data?.content?.data) {
@@ -42,7 +43,6 @@ export default function Header({ inLoginButtonVisible }) {
           const blob = new Blob([byteArray]);
           objectUrl = URL.createObjectURL(blob);
           setProfileImage(objectUrl);
-          console.log(objectUrl);
         }
       } catch (err) {
         console.error(err);
