@@ -39,6 +39,7 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
     const getProfilePicture = async () => {
       try {
         const response = await axios.get(APIURL + "/get-picture", {
+          params: { ownPicture: isOwnProfile },
           withCredentials: true,
         });
         if (response?.data?.content?.data) {
@@ -46,7 +47,8 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
           const blob = new Blob([byteArray]);
           objectUrl = URL.createObjectURL(blob);
           setProfileImage(objectUrl);
-          console.log(objectUrl);
+        } else {
+          setProfileImage("/picture_placeholder.png");
         }
       } catch (err) {
         console.error(err);
