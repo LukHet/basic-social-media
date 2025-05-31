@@ -39,7 +39,7 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
     const getProfilePicture = async () => {
       try {
         const response = await axios.get(APIURL + "/get-picture", {
-          params: { ownPicture: isOwnProfile },
+          params: { ownPicture: isOwnProfile, userId: slug },
           withCredentials: true,
         });
         if (response?.data?.content?.data) {

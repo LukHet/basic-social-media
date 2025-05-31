@@ -305,7 +305,7 @@ app.post("/post-picture", verifySession, async (req, res) => {
 });
 
 app.get("/get-picture", verifySession, async (req, res) => {
-  const { ownPicture } = req.query;
+  const ownPicture = req.query.ownPicture === "true"; //convertin string into boolean
   let { userId } = req.query;
 
   if (!userId && !ownPicture) {
