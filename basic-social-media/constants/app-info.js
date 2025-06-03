@@ -20,3 +20,7 @@ export const MAX_POST_LENGTH = 500;
 export const MAX_COMMENT_LENGTH = 300;
 
 export const ALLOWED_FILE_EXTENSIONS = ["jpg", "jpeg", "png"];
+
+export const MIN_PASSWORD_LENGTH = 8;
+
+export const MAX_PASSWORD_LENGTH = 64;

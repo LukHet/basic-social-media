@@ -15,6 +15,8 @@ import {
   MAX_STRING_LENGTH,
   EMAIL_REGEX,
   MAX_COMMENT_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  MAX_PASSWORD_LENGTH,
 } from "../constants/app-info.js";
 
 const corsOptions = {
@@ -339,6 +341,55 @@ app.get("/get-picture", verifySession, async (req, res) => {
   }
 });
 
+app.post("/change-password", verifySession, async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const { userId } = req;
+
+  if (
+    newPassword.length < MIN_PASSWORD_LENGTH ||
+    newPassword.length > MAX_PASSWORD_LENGTH
+  ) {
+    return res
+      .status(400)
+      .json({
+        message:
+          "New password should be longer than 8 characters and shorter than 64 characters.",
+      });
+  }
+
+  try {
+    const usersPassword = db
+      .prepare("SELECT password FROM users WHERE email = ?")
+      .get(oldPassword);
+
+    const comparePasswordsResult = await bcrypt.compare(
+      password,
+      foundUser.password
+    );
+
+    if (comparePasswordsResult) {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+      const update = db
+        .prepare("UPDATE users SET password = WHERE id = ?")
+        .run(hashedPassword, userId);
+
+      return res
+        .status(200)
+        .json({ message: "Password has been succesfully changed!" });
+    } else {
+      return res
+        .status(401)
+        .json({ message: "The given old password was incorrect!" });
+    }
+  } catch (err) {
+    return res
+      .status(404)
+      .json({ message: "Couldn't change the password: ", err });
+  }
+});
+
 app.post("/delete-comment", verifySession, async (req, res) => {
   const { commentId } = req.body;
 
@@ -449,14 +500,17 @@ app.post("/user-register", async (req, res) => {
     req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
+    return res.status(401).json({ message: "Email and password are required" });
   }
 
   if (!EMAIL_REGEX.test(email)) {
     return res.status(400).json({ message: "Provided email is incorrect" });
   }
 
-  if (password.length < 8 || password.length > 64) {
+  if (
+    password.length < MIN_PASSWORD_LENGTH ||
+    password.length > MAX_PASSWORD_LENGTH
+  ) {
     return res.status(400).json({
       message:
         "Password should be longer than 8 characters and shorter than 64 characters.",
