@@ -153,7 +153,9 @@ app.get("/posts", verifySession, async (req, res) => {
 
 app.get("/user-posts", verifySession, async (req, res) => {
   const { userId } = req;
-  const posts = db.prepare("SELECT * from posts WHERE user_id = ?").all(userId);
+  const posts = db
+    .prepare("SELECT * from posts WHERE user_id = ? LIMIT 3")
+    .all(userId);
   return res.status(200).json(posts);
 });
 
@@ -181,7 +183,7 @@ app.get("/get-comments", verifySession, async (req, res) => {
   const { postId } = req.query;
   try {
     const comments = db
-      .prepare("SELECT * from comments WHERE post_id = ?")
+      .prepare("SELECT * from comments WHERE post_id = ? LIMIT 3")
       .all(postId);
     return res.status(200).json(comments);
   } catch (err) {
@@ -196,7 +198,9 @@ app.get("/search-users", verifySession, async (req, res) => {
 
   try {
     const foundUsers = db
-      .prepare("SELECT * FROM users WHERE name LIKE ? OR surname LIKE ?")
+      .prepare(
+        "SELECT * FROM users WHERE name LIKE ? OR surname LIKE ? LIMIT 5"
+      )
       .all([`%${searchValue}%`, `%${searchValue}%`]);
 
     res.status(200).json(foundUsers);
@@ -349,12 +353,10 @@ app.post("/change-password", verifySession, async (req, res) => {
     newPassword.length < MIN_PASSWORD_LENGTH ||
     newPassword.length > MAX_PASSWORD_LENGTH
   ) {
-    return res
-      .status(400)
-      .json({
-        message:
-          "New password should be longer than 8 characters and shorter than 64 characters.",
-      });
+    return res.status(400).json({
+      message:
+        "New password should be longer than 8 characters and shorter than 64 characters.",
+    });
   }
 
   try {
