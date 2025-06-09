@@ -13,6 +13,7 @@ export default function PostInput() {
   const [posts, setPosts] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [postLength, setPostLength] = useState(0);
+  const [buttonDisabled, setButtonDisabled] = useState(true);
 
   const getPosts = async () => {
     try {
@@ -42,12 +43,16 @@ export default function PostInput() {
   }, []);
 
   const onPostValueChange = (e) => {
+    setButtonDisabled(e.target.value.length === 0);
     if (e.target.value.length >= MAX_POST_LENGTH + 1) return;
     setPostValue(e.target.value);
     setPostLength(e.target.value.length);
   };
 
   const sendNewPost = async () => {
+    if (!postValue || postValue.length === 0) {
+      return;
+    }
     const currentDate = new Date();
     const formattedCurrentDate = currentDate
       .toISOString()
@@ -101,6 +106,7 @@ export default function PostInput() {
             label="Publish"
             onClick={sendNewPost}
             additionalClass="!mx-1"
+            disabled={buttonDisabled}
           />
           <p>
             {postLength} / {MAX_POST_LENGTH}

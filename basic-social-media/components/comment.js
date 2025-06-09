@@ -11,12 +11,14 @@ export default function Comment({ postId, userId, isOwnPost }) {
   const [comment, setComment] = useState("");
   const [postComments, setPostComments] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [buttonDisabled, setButtonDisabled] = useState(true);
 
   useEffect(() => {
     getPostComments();
   }, []);
 
   const handleCommentChange = (e) => {
+    setButtonDisabled(e.target.value.length === 0);
     setComment(e.target.value);
   };
 
@@ -49,6 +51,12 @@ export default function Comment({ postId, userId, isOwnPost }) {
     setErrorMessage("");
     if (comment.length > MAX_COMMENT_LENGTH) {
       setErrorMessage("Provided comment was too long");
+      return;
+    }
+
+    if (!comment || comment.length === 0) {
+      setErrorMessage("Provide comment content before sending it");
+      return;
     }
     const currentDate = new Date();
     const formattedCurrentDate = currentDate
@@ -82,7 +90,11 @@ export default function Comment({ postId, userId, isOwnPost }) {
           onChange={handleCommentChange}
           value={comment}
         />
-        <Button label="Post comment" onClick={postComment} />
+        <Button
+          label="Post comment"
+          onClick={postComment}
+          disabled={buttonDisabled}
+        />
         <p className="text-red-500">{errorMessage}</p>
       </div>
       <PostComments

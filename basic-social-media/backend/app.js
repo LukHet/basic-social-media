@@ -37,8 +37,8 @@ const server = createServer(app);
 const io = new Server(server, { cors: corsOptions });
 
 app.use(cors(corsOptions));
-app.use(express.json());
 app.use(cookieParser());
+app.use(express.json({ limit: "5mb" }));
 
 io.on("connection", (socket) => {
   socket.on("send", (value) => {
