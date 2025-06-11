@@ -19,7 +19,7 @@ export default function TextInput({
     >
       {label ? (
         <label
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white mt-5"
+          className="block mb-2 text-sm font-medium text-gray-900 mt-5"
           htmlFor={id}
         >
           {label}
