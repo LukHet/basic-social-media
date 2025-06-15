@@ -59,7 +59,7 @@ server.listen(PORT, () => {
 app.get("/user-data", (req, res) => {
   const authSessionFound = req.cookies.auth_session;
   const foundSession = db
-    .prepare("SELECT * FROM sessions WHERE id = ?")
+    .prepare("SELECT user_id FROM sessions WHERE id = ?")
     .get(authSessionFound);
   const foundUserId = parseInt(foundSession?.user_id);
   const foundUserData = db
@@ -73,7 +73,7 @@ app.get("/user-data", (req, res) => {
 app.get("/user-id", (req, res) => {
   const authSessionFound = req.cookies.auth_session;
   const foundSession = db
-    .prepare("SELECT * FROM sessions WHERE id = ?")
+    .prepare("SELECT user_id FROM sessions WHERE id = ?")
     .get(authSessionFound);
   const foundUserId = parseInt(foundSession?.user_id);
   res.json(foundUserId);
@@ -101,7 +101,7 @@ app.get("/user-logout", async (req, res) => {
   const authSessionFound = req.cookies.auth_session;
 
   const foundUser = db
-    .prepare("SELECT * FROM sessions WHERE id = ?")
+    .prepare("SELECT user_id FROM sessions WHERE id = ?")
     .get(authSessionFound);
 
   if (!foundUser) {
@@ -129,7 +129,9 @@ app.post("/user-post", verifySession, async (req, res) => {
   const postContent = content;
   const foundUserId = userId;
 
-  const foundUser = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+  const foundUser = db
+    .prepare("SELECT name, surname FROM users WHERE id = ?")
+    .get(userId);
   const userName = `${foundUser.name} ${foundUser.surname}`;
   try {
     const createdPost = db
@@ -147,14 +149,20 @@ app.post("/user-post", verifySession, async (req, res) => {
 });
 
 app.get("/posts", verifySession, async (req, res) => {
-  const posts = db.prepare("SELECT * from posts ORDER BY post_date DESC").all();
+  const posts = db
+    .prepare(
+      "SELECT id, user_id, author, post_date, content from posts ORDER BY post_date DESC"
+    )
+    .all();
   return res.status(200).json(posts);
 });
 
 app.get("/user-posts", verifySession, async (req, res) => {
   const { userId } = req;
   const posts = db
-    .prepare("SELECT * from posts WHERE user_id = ? LIMIT 3")
+    .prepare(
+      "SELECT id, user_id, author, post_date, content from posts WHERE user_id = ? LIMIT 3"
+    )
     .all(userId);
   return res.status(200).json(posts);
 });
@@ -162,7 +170,9 @@ app.get("/user-posts", verifySession, async (req, res) => {
 app.get("/other-user-posts", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
   const posts = db
-    .prepare("SELECT * from posts WHERE user_id = ?")
+    .prepare(
+      "SELECT id, user_id, author, post_date, content from posts WHERE user_id = ?"
+    )
     .all(otherUserId);
   return res.status(200).json(posts);
 });
@@ -171,7 +181,7 @@ app.get("/get-likes", verifySession, async (req, res) => {
   const { postId } = req.query;
   try {
     const likes = db
-      .prepare("SELECT * from likes WHERE post_id = ?")
+      .prepare("SELECT id, user_id, author from likes WHERE post_id = ?")
       .all(postId);
     return res.status(200).json(likes);
   } catch (err) {
@@ -183,7 +193,9 @@ app.get("/get-comments", verifySession, async (req, res) => {
   const { postId } = req.query;
   try {
     const comments = db
-      .prepare("SELECT * from comments WHERE post_id = ? LIMIT 3")
+      .prepare(
+        "SELECT id, user_id, author, comment_date, content from comments WHERE post_id = ? LIMIT 3"
+      )
       .all(postId);
     return res.status(200).json(comments);
   } catch (err) {
@@ -199,7 +211,7 @@ app.get("/search-users", verifySession, async (req, res) => {
   try {
     const foundUsers = db
       .prepare(
-        "SELECT * FROM users WHERE name LIKE ? OR surname LIKE ? LIMIT 5"
+        "SELECT name, surname, id FROM users WHERE name LIKE ? OR surname LIKE ? LIMIT 5"
       )
       .all([`%${searchValue}%`, `%${searchValue}%`]);
 
@@ -450,7 +462,7 @@ app.get("/get-comment-likes", verifySession, async (req, res) => {
   const { commentId } = req.query;
   try {
     const likes = db
-      .prepare("SELECT * from comment_likes WHERE comment_id = ?")
+      .prepare("SELECT user_id from comment_likes WHERE comment_id = ?")
       .all(commentId);
     return res.status(200).json(likes);
   } catch (err) {
@@ -473,7 +485,7 @@ app.get("/chat-messages", verifySession, async (req, res) => {
   try {
     const foundMessages = db
       .prepare(
-        "SELECT * FROM messages WHERE (receiver_id = ? AND sender_id = ?) OR (receiver_id = ? AND sender_id = ?)"
+        "SELECT id, content, sender_id, message_date FROM messages WHERE (receiver_id = ? AND sender_id = ?) OR (receiver_id = ? AND sender_id = ?)"
       )
       .all(receiverId, senderId, senderId, receiverId);
 
@@ -588,7 +600,7 @@ app.post("/user-login", async (req, res) => {
 
   try {
     const foundUser = db
-      .prepare("SELECT * FROM users WHERE email = ?")
+      .prepare("SELECT password, id FROM users WHERE email = ?")
       .get(email);
 
     const comparePasswordsResult = await bcrypt.compare(
