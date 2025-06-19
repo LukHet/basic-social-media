@@ -373,12 +373,12 @@ app.post("/change-password", verifySession, async (req, res) => {
 
   try {
     const usersPassword = db
-      .prepare("SELECT password FROM users WHERE email = ?")
-      .get(oldPassword);
+      .prepare("SELECT password FROM users WHERE id = ?")
+      .get(userId);
 
     const comparePasswordsResult = await bcrypt.compare(
-      password,
-      foundUser.password
+      oldPassword,
+      usersPassword.password
     );
 
     if (comparePasswordsResult) {
@@ -386,7 +386,7 @@ app.post("/change-password", verifySession, async (req, res) => {
       const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
       const update = db
-        .prepare("UPDATE users SET password = WHERE id = ?")
+        .prepare("UPDATE users SET password = ? WHERE id = ?")
         .run(hashedPassword, userId);
 
       return res

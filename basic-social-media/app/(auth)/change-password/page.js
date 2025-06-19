@@ -3,12 +3,18 @@
 import TextInput from "@/components/text-input";
 import Button from "@/components/button";
 import { useState, useEffect } from "react";
-import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from "@/constants/app-info";
+import {
+  MIN_PASSWORD_LENGTH,
+  MAX_PASSWORD_LENGTH,
+  APIURL,
+} from "@/constants/app-info";
+import axios from "axios";
 
 export default function ChangePassword() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [statusMessage, setStatusMessage] = useState("");
 
   const onOldPasswordChange = (e) => {
     setOldPassword(e.target.value);
@@ -29,6 +35,24 @@ export default function ChangePassword() {
       setIsButtonDisabled(true);
     }
   }, [newPassword, oldPassword]);
+
+  const handleButtonClick = async () => {
+    try {
+      const res = await axios.post(
+        APIURL + "/change-password",
+        {
+          oldPassword: oldPassword,
+          newPassword: newPassword,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      setStatusMessage(res?.data?.message);
+    } catch (err) {
+      setStatusMessage(err.response.data.message);
+    }
+  };
 
   return (
     <main>
@@ -52,7 +76,9 @@ export default function ChangePassword() {
             additionalClass="mt-5"
             label="Confirm password change"
             disabled={isButtonDisabled}
+            onClick={handleButtonClick}
           />
+          <p className="text-center mt-3">{statusMessage}</p>
         </div>
       </div>
     </main>
