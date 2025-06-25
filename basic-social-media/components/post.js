@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Comment from "./comment";
 import Like from "./like";
+import Share from "./share";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -24,6 +25,10 @@ export default function Post({ post, userId, deletePost }) {
       }
     };
   }, []);
+
+  const handleShareClick = () => {
+    //TODO
+  };
 
   const getProfilePicture = async () => {
     try {
@@ -75,7 +80,10 @@ export default function Post({ post, userId, deletePost }) {
         </div>
       </div>
       <div className="mt-5 text-xl">{post.content}</div>
-      <Like postId={post.id} userId={userId} />
+      <div className="flex justify-between">
+        <Like postId={post.id} userId={userId} />
+        <Share postId={post.id} />
+      </div>
       <Comment postId={post.id} userId={userId} isOwnPost={isOwnPost} />
     </div>
   );
