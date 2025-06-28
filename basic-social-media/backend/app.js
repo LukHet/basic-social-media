@@ -167,6 +167,27 @@ app.get("/user-posts", verifySession, async (req, res) => {
   return res.status(200).json(posts);
 });
 
+app.get("/single-post", verifySession, async (req, res) => {
+  const { postId } = req.query;
+  if (!postId) {
+    return res.status(400).json({ message: "Post ID must be provided!" });
+  }
+  try {
+    const post = db
+      .prepare(
+        "SELECT id, user_id, author, post_date, content from posts WHERE id = ?"
+      )
+      .all(postId);
+
+    if (!post || post.length === 0) {
+      return res.status(404).json({ message: "Couldn't find the post!" });
+    }
+    return res.status(200).json(post);
+  } catch (err) {
+    return res.status(404).json({ message: "There was an error" });
+  }
+});
+
 app.get("/other-user-posts", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
   const posts = db
