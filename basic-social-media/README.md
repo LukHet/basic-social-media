@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Basic Social Media
 
-## Getting Started
+**Basic Social Media** is a simple social media application that includes essential features such as:
 
-First, run the development server:
+- User profiles
+- Chat functionality
+- Posting and commenting
+
+The frontend is built with [Next.js](https://nextjs.org), and the backend runs as a separate Node.js server.
+
+---
+
+## Tech Stack & Libraries
+
+### Frontend (Next.js + React):
+
+- `Next.js` – framework for server-rendered React apps
+- `React` 19 – for building UI components
+- `axios` – for HTTP requests
+- `socket.io-client` – real-time communication
+- `framer-motion` & `motion` – animations
+- `@lucia-auth/adapter-sqlite` – authentication adapter
+- `Tailwind CSS` – utility-first styling
+
+### Backend (Node.js + Express):
+
+- `express` – server framework
+- `lucia` – authentication library
+- `better-sqlite3` – database layer
+- `socket.io` – real-time server
+- `bcrypt` – password hashing
+- `cors`, `cookie`, `cookie-parser` – middleware utilities
+- `@oslojs/crypto`, `@oslojs/encoding` – low-level crypto utilities
+- `uuid` – for generating unique IDs
+
+---
+
+## Requirements
+
+- Node.js >= 18.x
+- npm >= 9.x
+
+---
+
+## Installation
+
+Install dependencies by running the following command **separately** in both the main project folder and the `backend` folder:
+
+```bash
+npm install
+```
+
+---
+
+## Running the Application
+
+To start the application, use the following commands in separate terminals:
+
+1. Start the frontend (in the main project folder):
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The frontend will be available at: http://localhost:3000
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+2. Start the backend (in the backend folder):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm start
+```
 
-## Learn More
+The backend server will typically run on http://localhost:8080 or another specified port.
 
-To learn more about Next.js, take a look at the following resources:
+Make sure to update the constants in `constants/app-info.js` to match your specific configuration (e.g., API URLs, feature flags, etc.).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed for educational and personal use.
