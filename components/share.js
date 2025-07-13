@@ -1,13 +1,9 @@
 import Button from "./button";
 
-export default function Share({ onClick, postId }) {
-  const handleShareButtonClick = () => {
-    onClick && onClick();
-  };
-
+export default function ShareButton({ onClick, postId, label }) {
   return (
     <Button
-      label="Share post"
+      label={label}
       onClick={onClick}
       href={`/post-view/${postId}`}
       additionalClass={"!mx-0"}

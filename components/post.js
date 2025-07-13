@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Comment from "./comment";
 import Like from "./like";
-import Share from "./share";
+import ShareButton from "./share";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -13,6 +13,7 @@ import { redirect } from "next/navigation";
 export default function Post({ post, userId, deletePost }) {
   const [profileImage, setProfileImage] = useState(null);
 
+  const baseUrl = `${window.location.protocol}//${window.location.host}`;
   const href = post ? `/profile/${post.user_id}` : null;
   const isOwnPost = post ? post.user_id === userId : false;
   let objectUrl = null;
@@ -31,6 +32,10 @@ export default function Post({ post, userId, deletePost }) {
     if (post && post.id) {
       redirect(`post-view/${post.id}`);
     }
+  };
+
+  const handleCopyPostsLinkClick = () => {
+    navigator.clipboard.writeText(baseUrl + "/" + `post-view/${post.id}`);
   };
 
   const getProfilePicture = async () => {
@@ -87,7 +92,16 @@ export default function Post({ post, userId, deletePost }) {
           <div className="mt-5 text-xl">{post.content}</div>
           <div className="flex justify-between">
             <Like postId={post.id} userId={userId} />
-            <Share postId={post.id} onClick={handleShareClick} />
+            <ShareButton
+              postId={post.id}
+              onClick={handleShareClick}
+              label="Share post"
+            />
+            <ShareButton
+              postId={post.id}
+              onClick={handleCopyPostsLinkClick}
+              label="Copy posts link"
+            />
           </div>
           <Comment postId={post.id} userId={userId} isOwnPost={isOwnPost} />
         </>
