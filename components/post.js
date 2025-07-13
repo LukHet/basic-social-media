@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Comment from "./comment";
 import Like from "./like";
-import ShareButton from "./share";
+import CopyButton from "./copy-button";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -12,6 +12,7 @@ import { redirect } from "next/navigation";
 
 export default function Post({ post, userId, deletePost }) {
   const [profileImage, setProfileImage] = useState(null);
+  const [copyButtonText, setCopyButtonText] = useState("Copy posts link");
 
   const baseUrl = `${window.location.protocol}//${window.location.host}`;
   const href = post ? `/profile/${post.user_id}` : null;
@@ -35,7 +36,9 @@ export default function Post({ post, userId, deletePost }) {
   };
 
   const handleCopyPostsLinkClick = () => {
-    navigator.clipboard.writeText(baseUrl + "/" + `post-view/${post.id}`);
+    const postUrl = baseUrl + "/" + `post-view/${post.id}`;
+    navigator.clipboard.writeText(postUrl);
+    setCopyButtonText("Copied to clipboard!");
   };
 
   const getProfilePicture = async () => {
@@ -44,12 +47,10 @@ export default function Post({ post, userId, deletePost }) {
         params: { userId: post.user_id },
         withCredentials: true,
       });
-      console.log(response);
       if (response?.data?.content?.data) {
         const byteArray = new Uint8Array(response.data.content.data);
         const blob = new Blob([byteArray]);
         objectUrl = URL.createObjectURL(blob);
-        console.log(objectUrl);
         setProfileImage(objectUrl);
       }
     } catch (err) {
@@ -89,18 +90,18 @@ export default function Post({ post, userId, deletePost }) {
               ) : null}
             </div>
           </div>
-          <div className="mt-5 text-xl">{post.content}</div>
+          <div
+            className="mt-5 text-xl cursor-pointer"
+            onClick={handleShareClick}
+          >
+            {post.content}
+          </div>
           <div className="flex justify-between">
             <Like postId={post.id} userId={userId} />
-            <ShareButton
-              postId={post.id}
-              onClick={handleShareClick}
-              label="Share post"
-            />
-            <ShareButton
+            <CopyButton
               postId={post.id}
               onClick={handleCopyPostsLinkClick}
-              label="Copy posts link"
+              label={copyButtonText}
             />
           </div>
           <Comment postId={post.id} userId={userId} isOwnPost={isOwnPost} />
