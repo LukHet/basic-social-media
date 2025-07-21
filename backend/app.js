@@ -87,6 +87,11 @@ app.get("/verify-user", verifySession, (req, res) => {
 
 app.get("/all-users", verifySession, (req, res) => {
   const { userId } = req;
+
+  if (!userId || isNaN(userId)) {
+    return res.status(400).send("Invalid user ID");
+  }
+
   try {
     const allUsers = db
       .prepare("SELECT name, surname, id FROM users WHERE NOT id = ?")
@@ -97,8 +102,12 @@ app.get("/all-users", verifySession, (req, res) => {
   }
 });
 
-app.get("/user-logout", async (req, res) => {
+app.post("/user-logout", async (req, res) => {
   const authSessionFound = req.cookies.auth_session;
+
+  if (!authSessionFound || typeof authSessionFound !== "string") {
+    return res.status(400).send("Invalid session");
+  }
 
   const foundUser = db
     .prepare("SELECT user_id FROM sessions WHERE id = ?")
@@ -120,25 +129,35 @@ app.post("/user-post", verifySession, async (req, res) => {
   const { content, post_date } = req.body;
   const { userId } = req;
 
-  if (content.length === 0 || content.length > MAX_STRING_LENGTH) {
+  if (
+    typeof content !== "string" ||
+    content.trim().length === 0 ||
+    content.length > MAX_STRING_LENGTH
+  ) {
     return res
       .status(400)
       .json({ message: "Provided post content has incorrect length" });
   }
 
-  const postContent = content;
-  const foundUserId = userId;
+  if (!post_date || isNaN(Date.parse(post_date))) {
+    return res.status(400).json({ message: "Provided post date is invalid" });
+  }
 
   const foundUser = db
     .prepare("SELECT name, surname FROM users WHERE id = ?")
     .get(userId);
+
+  if (!foundUser) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
   const userName = `${foundUser.name} ${foundUser.surname}`;
   try {
     const createdPost = db
       .prepare(
         "INSERT INTO posts (user_id, content, post_date, author) VALUES (?, ?, ?, ?)"
       )
-      .run(foundUserId, postContent, post_date, userName);
+      .run(userId, content, post_date, userName);
 
     return res.status(200).json({ message: "Post published successfully!" });
   } catch (err) {
@@ -149,53 +168,75 @@ app.post("/user-post", verifySession, async (req, res) => {
 });
 
 app.get("/posts", verifySession, async (req, res) => {
-  const posts = db
-    .prepare(
-      "SELECT id, user_id, author, post_date, content from posts ORDER BY post_date DESC"
-    )
-    .all();
-  return res.status(200).json(posts);
+  const postsLimit = 10;
+  const postsOffset = 0;
+  try {
+    const posts = db
+      .prepare(
+        "SELECT id, user_id, author, post_date, content from posts ORDER BY post_date DESC LIMIT ? OFFSET ?"
+      )
+      .all(postsLimit, postsOffset);
+    return res.status(200).json(posts);
+  } catch (err) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 app.get("/user-posts", verifySession, async (req, res) => {
   const { userId } = req;
-  const posts = db
-    .prepare(
-      "SELECT id, user_id, author, post_date, content from posts WHERE user_id = ? LIMIT 3"
-    )
-    .all(userId);
-  return res.status(200).json(posts);
+  const userPostsLimit = 3;
+  try {
+    const posts = db
+      .prepare(
+        "SELECT id, user_id, author, post_date, content from posts WHERE user_id = ? LIMIT ?"
+      )
+      .all(userId, userPostsLimit);
+    return res.status(200).json(posts);
+  } catch (err) {
+    return res.status(500).json({ message: "Failed to fetch user posts" });
+  }
 });
 
 app.get("/single-post", verifySession, async (req, res) => {
   const { postId } = req.query;
-  if (!postId) {
-    return res.status(400).json({ message: "Post ID must be provided!" });
+
+  if (!postId || isNaN(postId) || postId <= 0) {
+    return res.status(400).json({ message: "Invalid Post ID!" });
   }
+
   try {
     const post = db
       .prepare(
         "SELECT id, user_id, author, post_date, content from posts WHERE id = ?"
       )
-      .all(postId);
+      .get(postId);
 
     if (!post || post.length === 0) {
       return res.status(404).json({ message: "Couldn't find the post!" });
     }
     return res.status(200).json(post);
   } catch (err) {
-    return res.status(404).json({ message: "There was an error" });
+    return res.status(500).json({ message: "There was an error" });
   }
 });
 
 app.get("/other-user-posts", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
-  const posts = db
-    .prepare(
-      "SELECT id, user_id, author, post_date, content from posts WHERE user_id = ?"
-    )
-    .all(otherUserId);
-  return res.status(200).json(posts);
+
+  if (!otherUserId || isNaN(otherUserId) || otherUserId <= 0) {
+    return res.status(400).json({ message: "Invalid Post ID!" });
+  }
+
+  try {
+    const posts = db
+      .prepare(
+        "SELECT id, user_id, author, post_date, content from posts WHERE user_id = ?"
+      )
+      .all(otherUserId);
+    return res.status(200).json(posts);
+  } catch (err) {
+    return res.status(500).json({ message: "There was an error" });
+  }
 });
 
 app.get("/get-likes", verifySession, async (req, res) => {

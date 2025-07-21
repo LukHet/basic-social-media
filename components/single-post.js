@@ -17,7 +17,7 @@ export default function SinglePost({ postId }) {
           withCredentials: true,
         });
         if (response?.data) {
-          setPost(response.data[0]);
+          setPost(response.data);
         }
       } catch (err) {
         console.error(err);

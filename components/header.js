@@ -81,7 +81,7 @@ export default function Header({ inLoginButtonVisible }) {
 
   const logout = async () => {
     await axios
-      .get(APIURL + "/user-logout", {
+      .post(APIURL + "/user-logout", {
         withCredentials: true,
       })
       .then((res) => router.push("/main-page"))
