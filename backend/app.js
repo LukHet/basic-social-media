@@ -241,6 +241,11 @@ app.get("/other-user-posts", verifySession, async (req, res) => {
 
 app.get("/get-likes", verifySession, async (req, res) => {
   const { postId } = req.query;
+
+  if (!postId || isNaN(postId) || postId <= 0) {
+    return res.status(400).json({ message: "Invalid Post ID!" });
+  }
+
   try {
     const likes = db
       .prepare("SELECT id, user_id, author from likes WHERE post_id = ?")
@@ -253,6 +258,11 @@ app.get("/get-likes", verifySession, async (req, res) => {
 
 app.get("/get-comments", verifySession, async (req, res) => {
   const { postId } = req.query;
+
+  if (!postId || isNaN(postId) || postId <= 0) {
+    return res.status(400).json({ message: "Invalid Post ID!" });
+  }
+
   try {
     const comments = db
       .prepare(
@@ -270,6 +280,14 @@ app.get("/get-comments", verifySession, async (req, res) => {
 app.get("/search-users", verifySession, async (req, res) => {
   const { searchValue } = req.query;
 
+  if (
+    !searchValue ||
+    searchValue.length <= 0 ||
+    searchValue.length > MAX_STRING_LENGTH
+  ) {
+    return res.status(400).json({ message: "Invalid search value!" });
+  }
+
   try {
     const foundUsers = db
       .prepare(
@@ -286,6 +304,15 @@ app.get("/search-users", verifySession, async (req, res) => {
 app.post("/post-like", verifySession, async (req, res) => {
   const { postId } = req.body;
   const { userId } = req;
+
+  if (!postId || isNaN(postId) || postId <= 0) {
+    return res.status(400).json({ message: "Invalid Post ID!" });
+  }
+
+  if (!userId || isNaN(userId) || userId <= 0) {
+    return res.status(400).json({ message: "Invalid User ID!" });
+  }
+
   try {
     const foundUserData = db
       .prepare("SELECT name, surname FROM users WHERE id = ?")
@@ -306,6 +333,15 @@ app.post("/post-like", verifySession, async (req, res) => {
 app.post("/delete-like", verifySession, async (req, res) => {
   const { postId } = req.body;
   const { userId } = req;
+
+  if (!postId || isNaN(postId) || postId <= 0) {
+    return res.status(400).json({ message: "Invalid Post ID!" });
+  }
+
+  if (!userId || isNaN(userId) || userId <= 0) {
+    return res.status(400).json({ message: "Invalid User ID!" });
+  }
+
   try {
     const deleteLiked = db
       .prepare("DELETE FROM likes WHERE user_id=? AND post_id=?")
@@ -319,6 +355,11 @@ app.post("/delete-like", verifySession, async (req, res) => {
 
 app.post("/delete-post", verifySession, async (req, res) => {
   const { postId } = req.body;
+
+  if (!postId || isNaN(postId) || postId <= 0) {
+    return res.status(400).json({ message: "Invalid Post ID!" });
+  }
+
   try {
     const deletedPost = db.prepare("DELETE FROM posts WHERE id=?").run(postId);
     return res.status(200).json({ message: "Post has been deleted!" });
@@ -331,10 +372,33 @@ app.post("/post-comment", verifySession, async (req, res) => {
   const { postId, content, comment_date } = req.body;
   const { userId } = req;
 
+  if (!userId || isNaN(userId) || userId <= 0) {
+    return res.status(400).json({ message: "Invalid User ID!" });
+  }
+
+  if (!postId || isNaN(postId) || postId <= 0) {
+    return res.status(400).json({ message: "Invalid Post ID!" });
+  }
+
   if (content.length === 0 || !content || content.length > MAX_COMMENT_LENGTH) {
     return res
       .status(404)
       .json({ message: "Provided comment is too long or doesn't exist" });
+  }
+
+  const parsedDate = new Date(comment_date);
+
+  if (!comment_date || isNaN(parsedDate.getTime())) {
+    return res
+      .status(400)
+      .json({ message: "Invalid or missing comment date!" });
+  }
+
+  const now = new Date();
+  if (parsedDate > now) {
+    return res
+      .status(400)
+      .json({ message: "Comment date cannot be in the future." });
   }
 
   try {
@@ -361,6 +425,10 @@ app.post("/post-comment", verifySession, async (req, res) => {
 app.post("/post-picture", verifySession, async (req, res) => {
   const { userId } = req;
   const { content } = req.body;
+
+  if (!userId || isNaN(userId) || userId <= 0) {
+    return res.status(400).json({ message: "Invalid User ID!" });
+  }
 
   if (!content) {
     return res.status(400).json({ message: "Content is required" });
