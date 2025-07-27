@@ -3,7 +3,11 @@
 import { useState } from "react";
 import FileInput from "./file-input";
 import Button from "./button";
-import { ALLOWED_FILE_EXTENSIONS, APIURL } from "@/constants/app-info";
+import {
+  ALLOWED_FILE_EXTENSIONS,
+  APIURL,
+  MAX_FILE_SIZE,
+} from "@/constants/app-info";
 import Image from "next/image";
 import axios from "axios";
 
@@ -22,12 +26,15 @@ export default function PicturePopup({ onClose }) {
     setFile(selectedFile);
     setFileSize(selectedFile.size);
     const fileExtension = selectedFile.name.split(".").pop().toLowerCase();
-    const isFileAllowed = ALLOWED_FILE_EXTENSIONS.includes(fileExtension);
+    const isFileAllowed =
+      ALLOWED_FILE_EXTENSIONS.includes(fileExtension) &&
+      selectedFile.size < MAX_FILE_SIZE;
     setIsUploadAllowed(isFileAllowed);
     if (isFileAllowed) {
       const objectUrl = URL.createObjectURL(selectedFile);
       setImageURL(objectUrl);
-      console.log(objectUrl);
+    } else {
+      setErrorMessage("Only jpg, jpeg and png files up to 5MB are allowed!");
     }
   };
 
@@ -53,7 +60,10 @@ export default function PicturePopup({ onClose }) {
       setErrorMessage("New profile picture has been uploaded!");
       window.location.reload();
     } catch (err) {
-      setErrorMessage("Couldn't upload the picture: " + err);
+      const message =
+        err?.response?.data?.message || err?.message || "Unknown error";
+
+      setErrorMessage("Couldn't upload the picture: " + message);
     }
   };
 

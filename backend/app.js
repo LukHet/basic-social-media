@@ -17,7 +17,9 @@ import {
   MAX_COMMENT_LENGTH,
   MIN_PASSWORD_LENGTH,
   MAX_PASSWORD_LENGTH,
+  MAX_FILE_SIZE,
 } from "../constants/app-info.js";
+import isBase64PngorJpg from "./helpers.js";
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -434,10 +436,27 @@ app.post("/post-picture", verifySession, async (req, res) => {
     return res.status(400).json({ message: "Content is required" });
   }
 
+  if (!content.split(",")[0] || !content.split(",")[1]) {
+    return res
+      .status(400)
+      .json({ message: "Something went wrong, please upload another file." });
+  }
+
+  const contentInfo = content.split(",")[0];
+
+  if (!isBase64PngorJpg(contentInfo)) {
+    return res.status(400).json({ message: "Invalid file format." });
+  }
+
   try {
     const base64String = content.split(",")[1];
     const buffer = Buffer.from(base64String, "base64");
 
+    if (buffer.length > MAX_FILE_SIZE) {
+      return res
+        .status(400)
+        .json({ message: "File is too large. Max 2MB allowed." });
+    }
     const deleteOldUserPictures = db
       .prepare("DELETE FROM profile_pictures WHERE user_id=?")
       .run(userId);

@@ -24,3 +24,5 @@ export const ALLOWED_FILE_EXTENSIONS = ["jpg", "jpeg", "png"];
 export const MIN_PASSWORD_LENGTH = 8;
 
 export const MAX_PASSWORD_LENGTH = 64;
+
+export const MAX_FILE_SIZE = 5 * 1024 * 1024; //5MB
