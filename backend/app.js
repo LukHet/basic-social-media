@@ -428,7 +428,7 @@ app.post("/post-picture", verifySession, async (req, res) => {
   const { userId } = req;
   const { content } = req.body;
 
-  if (!userId || isNaN(userId) || userId <= 0) {
+  if (!userId || userId.trim().length === 0 || typeof userId !== "number") {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
@@ -475,18 +475,16 @@ app.get("/get-picture", verifySession, async (req, res) => {
   const ownPicture = req.query.ownPicture === "true"; //convertin string into boolean
   let { userId } = req.query;
 
-  if (!userId && !ownPicture) {
-    return res
-      .status(400)
-      .json({ message: "Missing userId or ownPicture flag." });
+  if (!userId || userId.trim().length === 0 || typeof userId !== "number") {
+    return res.status(400).json({ message: "Missing userId." });
+  }
+
+  if (!ownPicture && userId !== req.userId) {
+    return res.status(403).json({ message: "Forbidden. Access denied." });
   }
 
   if (ownPicture) {
     userId = req.userId;
-  }
-
-  if (!userId) {
-    return res.status(404).json({ message: "Couldn't find the user." });
   }
 
   try {
@@ -495,7 +493,7 @@ app.get("/get-picture", verifySession, async (req, res) => {
       .get(userId);
 
     if (!foundPicture) {
-      return res.status(404).json({ message: "Picture not found." });
+      return res.status(404).json({ message: "Picture not available." });
     }
 
     return res.status(200).json(foundPicture);
@@ -509,6 +507,34 @@ app.get("/get-picture", verifySession, async (req, res) => {
 app.post("/change-password", verifySession, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const { userId } = req;
+
+  if (!userId || userId.trim().length === 0 || typeof userId !== "number") {
+    return res.status(400).json({ message: "Provide user ID." });
+  }
+
+  if (
+    !oldPassword ||
+    oldPassword.length === 0 ||
+    !newPassword ||
+    newPassword.length === 0
+  ) {
+    return res.status(400).json({ message: "Provide old/new password." });
+  }
+
+  if (
+    typeof oldPassword !== "string" ||
+    typeof newPassword !== "string" ||
+    !oldPassword.trim() ||
+    !newPassword.trim()
+  ) {
+    return res.status(400).json({ message: "Invalid password input." });
+  }
+
+  if (oldPassword === newPassword) {
+    return res
+      .status(400)
+      .json({ message: "New password must be different from the old one." });
+  }
 
   if (
     newPassword.length < MIN_PASSWORD_LENGTH ||
@@ -524,6 +550,10 @@ app.post("/change-password", verifySession, async (req, res) => {
     const usersPassword = db
       .prepare("SELECT password FROM users WHERE id = ?")
       .get(userId);
+
+    if (!usersPassword) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
     const comparePasswordsResult = await bcrypt.compare(
       oldPassword,
@@ -547,35 +577,70 @@ app.post("/change-password", verifySession, async (req, res) => {
         .json({ message: "The given old password was incorrect!" });
     }
   } catch (err) {
-    return res
-      .status(404)
-      .json({ message: "Couldn't change the password: ", err });
+    return res.status(404).json({ message: "Couldn't change the password." });
   }
 });
 
 app.post("/delete-comment", verifySession, async (req, res) => {
   const { commentId } = req.body;
 
+  if (
+    !commentId ||
+    commentId.trim().length === 0 ||
+    typeof commentId !== "number"
+  ) {
+    return res.status(400).json({ message: "Provide valid comment ID." });
+  }
+
   try {
     const commentToDelete = db
       .prepare("DELETE from comments WHERE id = ?")
       .run(commentId);
 
+    if (!commentToDelete) {
+      return res.status(404).json({ message: "Couldn't find the comment." });
+    }
+
     return res.status(200).json({ message: "Comment has been deleted!" });
   } catch (err) {
-    return res
-      .status(404)
-      .json({ message: "Couldn't delete the comment: ", err });
+    return res.status(404).json({ message: "Couldn't delete the comment." });
   }
 });
 
 app.post("/comment-like", verifySession, async (req, res) => {
   const { commentId } = req.body;
   const { userId } = req;
+
+  if (
+    !commentId ||
+    commentId.trim().length === 0 ||
+    typeof commentId !== "number"
+  ) {
+    return res.status(400).json({ message: "Provide valid comment ID." });
+  }
+
+  if (!userId || userId.trim().length === 0 || typeof userId !== "number") {
+    return res.status(400).json({ message: "Provide valid user ID." });
+  }
+
   try {
+    const alreadyLiked = db
+      .prepare(
+        "SELECT 1 FROM comment_likes WHERE user_id = ? AND comment_id = ?"
+      )
+      .get(userId, commentId);
+
+    if (alreadyLiked) {
+      return res.status(400).json({ message: "Comment already liked." });
+    }
+
     const foundUserData = db
       .prepare("SELECT name, surname FROM users WHERE id = ?")
       .get(userId);
+
+    if (!foundUserData) {
+      return res.status(400).json({ message: "Couldn't find the user." });
+    }
 
     const author = foundUserData.name + " " + foundUserData.surname;
 
@@ -583,39 +648,73 @@ app.post("/comment-like", verifySession, async (req, res) => {
       .prepare("INSERT INTO comment_likes (user_id, comment_id) VALUES (?, ?)")
       .run(userId, commentId);
 
+    if (!commentLiked) {
+      return res.status(400).json({ message: "Couldn't find the comment." });
+    }
+
     return res.status(200).json({ message: "Comment has been liked!" });
   } catch (err) {
-    return res
-      .status(404)
-      .json({ message: "Couldn't like the comment: ", err });
+    return res.status(500).json({ message: "Couldn't like the comment." });
   }
 });
 
 app.post("/delete-comment-like", verifySession, async (req, res) => {
   const { commentId } = req.body;
   const { userId } = req;
+
+  if (
+    !commentId ||
+    commentId.trim().length === 0 ||
+    typeof commentId !== "number"
+  ) {
+    return res.status(400).json({ message: "Provide valid comment ID." });
+  }
+
+  if (!userId || userId.trim().length === 0 || typeof userId !== "number") {
+    return res.status(400).json({ message: "Provide valid user ID." });
+  }
+
   try {
     const deleteLiked = db
       .prepare("DELETE FROM comment_likes WHERE user_id=? AND comment_id=?")
       .run(userId, commentId);
 
+    if (!deleteLiked) {
+      return res
+        .status(400)
+        .json({ message: "Couldn't find the liked comment." });
+    }
+
     return res.status(200).json({ message: "Comment has been unliked!" });
   } catch (err) {
-    return res
-      .status(404)
-      .json({ message: "Couldn't unlike the comment: ", err });
+    return res.status(404).json({ message: "Couldn't unlike the comment." });
   }
 });
 
 app.get("/get-comment-likes", verifySession, async (req, res) => {
   const { commentId } = req.query;
+
+  if (
+    !commentId ||
+    commentId.trim().length === 0 ||
+    typeof commentId !== "number"
+  ) {
+    return res.status(400).json({ message: "Provide valid comment ID." });
+  }
+
   try {
     const likes = db
       .prepare("SELECT user_id from comment_likes WHERE comment_id = ?")
       .all(commentId);
+
+    if (!likes) {
+      return res
+        .status(404)
+        .json({ message: "Comment has no likes or it doesn't exist." });
+    }
     return res.status(200).json(likes);
   } catch (err) {
-    return res.status(404).json({ message: "Couldn't get likes: ", err });
+    return res.status(404).json({ message: "Couldn't get likes." });
   }
 });
 
