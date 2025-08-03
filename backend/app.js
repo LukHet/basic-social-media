@@ -19,7 +19,7 @@ import {
   MAX_PASSWORD_LENGTH,
   MAX_FILE_SIZE,
 } from "../constants/app-info.js";
-import isBase64PngorJpg from "./helpers.js";
+import { isBase64PngorJpg, isIdValid } from "./helpers.js";
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -69,7 +69,7 @@ app.get("/user-data", (req, res) => {
       "SELECT email, name, surname, birthdate, gender, city, country, id FROM users WHERE id = ?"
     )
     .get(foundUserId);
-  res.json(foundUserData);
+  return res.status(200).json(foundUserData);
 });
 
 app.get("/user-id", (req, res) => {
@@ -78,7 +78,7 @@ app.get("/user-id", (req, res) => {
     .prepare("SELECT user_id FROM sessions WHERE id = ?")
     .get(authSessionFound);
   const foundUserId = parseInt(foundSession?.user_id);
-  res.json(foundUserId);
+  return res.status(200).json(foundUserId);
 });
 
 app.get("/verify-user", verifySession, (req, res) => {
@@ -90,7 +90,7 @@ app.get("/verify-user", verifySession, (req, res) => {
 app.get("/all-users", verifySession, (req, res) => {
   const { userId } = req;
 
-  if (!userId || isNaN(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).send("Invalid user ID");
   }
 
@@ -98,9 +98,10 @@ app.get("/all-users", verifySession, (req, res) => {
     const allUsers = db
       .prepare("SELECT name, surname, id FROM users WHERE NOT id = ?")
       .all(userId);
-    res.status(200).json(allUsers);
+
+    return res.status(200).json(allUsers);
   } catch (err) {
-    res.status(404).send("Couldn't get users");
+    return res.status(500).send("Couldn't get the users");
   }
 });
 
@@ -121,15 +122,19 @@ app.post("/user-logout", async (req, res) => {
 
   try {
     await deleteAuthSession(res, foundUser.user_id);
-    res.send("Logged out successfully!");
+    return res.send("Logged out successfully!");
   } catch (error) {
-    res.status(500).send("Failed to log out");
+    return res.status(500).send("Failed to log out");
   }
 });
 
 app.post("/user-post", verifySession, async (req, res) => {
   const { content, post_date } = req.body;
   const { userId } = req;
+
+  if (!isIdValid(userId)) {
+    return res.status(400).json({ message: "Provided valid user ID" });
+  }
 
   if (
     typeof content !== "string" ||
@@ -178,6 +183,7 @@ app.get("/posts", verifySession, async (req, res) => {
         "SELECT id, user_id, author, post_date, content from posts ORDER BY post_date DESC LIMIT ? OFFSET ?"
       )
       .all(postsLimit, postsOffset);
+
     return res.status(200).json(posts);
   } catch (err) {
     return res.status(500).json({ message: "Internal server error" });
@@ -187,12 +193,18 @@ app.get("/posts", verifySession, async (req, res) => {
 app.get("/user-posts", verifySession, async (req, res) => {
   const { userId } = req;
   const userPostsLimit = 3;
+
+  if (!isIdValid(userId)) {
+    return res.status(400).json({ message: "Provided pvalid user ID" });
+  }
+
   try {
     const posts = db
       .prepare(
         "SELECT id, user_id, author, post_date, content from posts WHERE user_id = ? LIMIT ?"
       )
       .all(userId, userPostsLimit);
+
     return res.status(200).json(posts);
   } catch (err) {
     return res.status(500).json({ message: "Failed to fetch user posts" });
@@ -202,7 +214,7 @@ app.get("/user-posts", verifySession, async (req, res) => {
 app.get("/single-post", verifySession, async (req, res) => {
   const { postId } = req.query;
 
-  if (!postId || isNaN(postId) || postId <= 0) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -213,9 +225,6 @@ app.get("/single-post", verifySession, async (req, res) => {
       )
       .get(postId);
 
-    if (!post || post.length === 0) {
-      return res.status(404).json({ message: "Couldn't find the post!" });
-    }
     return res.status(200).json(post);
   } catch (err) {
     return res.status(500).json({ message: "There was an error" });
@@ -225,7 +234,7 @@ app.get("/single-post", verifySession, async (req, res) => {
 app.get("/other-user-posts", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
 
-  if (!otherUserId || isNaN(otherUserId) || otherUserId <= 0) {
+  if (!isIdValid(otherUserId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -235,6 +244,7 @@ app.get("/other-user-posts", verifySession, async (req, res) => {
         "SELECT id, user_id, author, post_date, content from posts WHERE user_id = ?"
       )
       .all(otherUserId);
+
     return res.status(200).json(posts);
   } catch (err) {
     return res.status(500).json({ message: "There was an error" });
@@ -244,7 +254,7 @@ app.get("/other-user-posts", verifySession, async (req, res) => {
 app.get("/get-likes", verifySession, async (req, res) => {
   const { postId } = req.query;
 
-  if (!postId || isNaN(postId) || postId <= 0) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -252,6 +262,7 @@ app.get("/get-likes", verifySession, async (req, res) => {
     const likes = db
       .prepare("SELECT id, user_id, author from likes WHERE post_id = ?")
       .all(postId);
+
     return res.status(200).json(likes);
   } catch (err) {
     return res.status(404).json({ message: "Couldn't get likes: ", err });
@@ -261,7 +272,7 @@ app.get("/get-likes", verifySession, async (req, res) => {
 app.get("/get-comments", verifySession, async (req, res) => {
   const { postId } = req.query;
 
-  if (!postId || isNaN(postId) || postId <= 0) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -271,6 +282,7 @@ app.get("/get-comments", verifySession, async (req, res) => {
         "SELECT id, user_id, author, comment_date, content from comments WHERE post_id = ? LIMIT 3"
       )
       .all(postId);
+
     return res.status(200).json(comments);
   } catch (err) {
     return res
@@ -299,7 +311,7 @@ app.get("/search-users", verifySession, async (req, res) => {
 
     res.status(200).json(foundUsers);
   } catch (err) {
-    res.status(404).json({ message: "Couldn't find the users: ", err });
+    res.status(500).json({ message: "Couldn't find the users: ", err });
   }
 });
 
@@ -307,11 +319,11 @@ app.post("/post-like", verifySession, async (req, res) => {
   const { postId } = req.body;
   const { userId } = req;
 
-  if (!postId || isNaN(postId) || postId <= 0) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
-  if (!userId || isNaN(userId) || userId <= 0) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
@@ -336,11 +348,11 @@ app.post("/delete-like", verifySession, async (req, res) => {
   const { postId } = req.body;
   const { userId } = req;
 
-  if (!postId || isNaN(postId) || postId <= 0) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
-  if (!userId || isNaN(userId) || userId <= 0) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
@@ -358,7 +370,7 @@ app.post("/delete-like", verifySession, async (req, res) => {
 app.post("/delete-post", verifySession, async (req, res) => {
   const { postId } = req.body;
 
-  if (!postId || isNaN(postId) || postId <= 0) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -374,11 +386,11 @@ app.post("/post-comment", verifySession, async (req, res) => {
   const { postId, content, comment_date } = req.body;
   const { userId } = req;
 
-  if (!userId || isNaN(userId) || userId <= 0) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
-  if (!postId || isNaN(postId) || postId <= 0) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -428,7 +440,7 @@ app.post("/post-picture", verifySession, async (req, res) => {
   const { userId } = req;
   const { content } = req.body;
 
-  if (!userId || userId.trim().length === 0 || typeof userId !== "number") {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
@@ -475,7 +487,7 @@ app.get("/get-picture", verifySession, async (req, res) => {
   const ownPicture = req.query.ownPicture === "true"; //convertin string into boolean
   let { userId } = req.query;
 
-  if (!userId || userId.trim().length === 0 || typeof userId !== "number") {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Missing userId." });
   }
 
@@ -508,7 +520,7 @@ app.post("/change-password", verifySession, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const { userId } = req;
 
-  if (!userId || userId.trim().length === 0 || typeof userId !== "number") {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provide user ID." });
   }
 
@@ -584,11 +596,7 @@ app.post("/change-password", verifySession, async (req, res) => {
 app.post("/delete-comment", verifySession, async (req, res) => {
   const { commentId } = req.body;
 
-  if (
-    !commentId ||
-    commentId.trim().length === 0 ||
-    typeof commentId !== "number"
-  ) {
+  if (!isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
@@ -611,15 +619,11 @@ app.post("/comment-like", verifySession, async (req, res) => {
   const { commentId } = req.body;
   const { userId } = req;
 
-  if (
-    !commentId ||
-    commentId.trim().length === 0 ||
-    typeof commentId !== "number"
-  ) {
+  if (!isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
-  if (!userId || userId.trim().length === 0 || typeof userId !== "number") {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provide valid user ID." });
   }
 
@@ -662,15 +666,11 @@ app.post("/delete-comment-like", verifySession, async (req, res) => {
   const { commentId } = req.body;
   const { userId } = req;
 
-  if (
-    !commentId ||
-    commentId.trim().length === 0 ||
-    typeof commentId !== "number"
-  ) {
+  if (!isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
-  if (!userId || userId.trim().length === 0 || typeof userId !== "number") {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provide valid user ID." });
   }
 
@@ -694,11 +694,7 @@ app.post("/delete-comment-like", verifySession, async (req, res) => {
 app.get("/get-comment-likes", verifySession, async (req, res) => {
   const { commentId } = req.query;
 
-  if (
-    !commentId ||
-    commentId.trim().length === 0 ||
-    typeof commentId !== "number"
-  ) {
+  if (!isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
@@ -720,16 +716,35 @@ app.get("/get-comment-likes", verifySession, async (req, res) => {
 
 app.get("/other-user-data", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
+
+  if (!isIdValid(otherUserId)) {
+    return res.status(400).json({ message: "Provide valid user ID." });
+  }
+
   const foundUserData = db
     .prepare(
       "SELECT email, name, surname, birthdate, gender, city, country FROM users WHERE id = ?"
     )
     .get(otherUserId);
+
+  if (!foundUserData) {
+    return res.status(404).json({ message: "Given user doesn't exist." });
+  }
+
   return res.status(200).json(foundUserData);
 });
 
 app.get("/chat-messages", verifySession, async (req, res) => {
   const { receiverId, senderId } = req.query;
+
+  if (!isIdValid(receiverId)) {
+    return res.status(400).json({ message: "Provide valid receiver ID." });
+  }
+
+  if (!isIdValid(senderId)) {
+    return res.status(400).json({ message: "Provide valid sender ID." });
+  }
+
   try {
     const foundMessages = db
       .prepare(
@@ -745,6 +760,15 @@ app.get("/chat-messages", verifySession, async (req, res) => {
 
 app.post("/send-message", verifySession, async (req, res) => {
   const { receiverId, senderId, content, messageDate } = req.body;
+
+  if (!isIdValid(receiverId)) {
+    return res.status(400).json({ message: "Provide valid receiver ID." });
+  }
+
+  if (!isIdValid(senderId)) {
+    return res.status(400).json({ message: "Provide valid sender ID." });
+  }
+
   try {
     const newMessage = db
       .prepare(
