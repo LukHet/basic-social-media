@@ -19,7 +19,7 @@ import {
   MAX_PASSWORD_LENGTH,
   MAX_FILE_SIZE,
 } from "../constants/app-info.js";
-import { isBase64PngorJpg, isIdValid } from "./helpers.js";
+import { isBase64PngorJpg, isIdValid, isUserDataValid } from "./helpers.js";
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -90,7 +90,7 @@ app.get("/verify-user", verifySession, (req, res) => {
 app.get("/all-users", verifySession, (req, res) => {
   const { userId } = req;
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).send("Invalid user ID");
   }
 
@@ -132,7 +132,7 @@ app.post("/user-post", verifySession, async (req, res) => {
   const { content, post_date } = req.body;
   const { userId } = req;
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).json({ message: "Provided valid user ID" });
   }
 
@@ -194,7 +194,7 @@ app.get("/user-posts", verifySession, async (req, res) => {
   const { userId } = req;
   const userPostsLimit = 3;
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).json({ message: "Provided pvalid user ID" });
   }
 
@@ -214,7 +214,7 @@ app.get("/user-posts", verifySession, async (req, res) => {
 app.get("/single-post", verifySession, async (req, res) => {
   const { postId } = req.query;
 
-  if (!isIdValid(postId)) {
+  if (isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -234,7 +234,7 @@ app.get("/single-post", verifySession, async (req, res) => {
 app.get("/other-user-posts", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
 
-  if (!isIdValid(otherUserId)) {
+  if (isIdValid(otherUserId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -254,7 +254,7 @@ app.get("/other-user-posts", verifySession, async (req, res) => {
 app.get("/get-likes", verifySession, async (req, res) => {
   const { postId } = req.query;
 
-  if (!isIdValid(postId)) {
+  if (isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -272,7 +272,7 @@ app.get("/get-likes", verifySession, async (req, res) => {
 app.get("/get-comments", verifySession, async (req, res) => {
   const { postId } = req.query;
 
-  if (!isIdValid(postId)) {
+  if (isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -319,11 +319,11 @@ app.post("/post-like", verifySession, async (req, res) => {
   const { postId } = req.body;
   const { userId } = req;
 
-  if (!isIdValid(postId)) {
+  if (isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
@@ -348,11 +348,11 @@ app.post("/delete-like", verifySession, async (req, res) => {
   const { postId } = req.body;
   const { userId } = req;
 
-  if (!isIdValid(postId)) {
+  if (isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
@@ -370,7 +370,7 @@ app.post("/delete-like", verifySession, async (req, res) => {
 app.post("/delete-post", verifySession, async (req, res) => {
   const { postId } = req.body;
 
-  if (!isIdValid(postId)) {
+  if (isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -386,11 +386,11 @@ app.post("/post-comment", verifySession, async (req, res) => {
   const { postId, content, comment_date } = req.body;
   const { userId } = req;
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
-  if (!isIdValid(postId)) {
+  if (isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -440,7 +440,7 @@ app.post("/post-picture", verifySession, async (req, res) => {
   const { userId } = req;
   const { content } = req.body;
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
@@ -487,7 +487,7 @@ app.get("/get-picture", verifySession, async (req, res) => {
   const ownPicture = req.query.ownPicture === "true"; //convertin string into boolean
   let { userId } = req.query;
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).json({ message: "Missing userId." });
   }
 
@@ -520,7 +520,7 @@ app.post("/change-password", verifySession, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const { userId } = req;
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).json({ message: "Provide user ID." });
   }
 
@@ -596,7 +596,7 @@ app.post("/change-password", verifySession, async (req, res) => {
 app.post("/delete-comment", verifySession, async (req, res) => {
   const { commentId } = req.body;
 
-  if (!isIdValid(commentId)) {
+  if (isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
@@ -619,11 +619,11 @@ app.post("/comment-like", verifySession, async (req, res) => {
   const { commentId } = req.body;
   const { userId } = req;
 
-  if (!isIdValid(commentId)) {
+  if (isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).json({ message: "Provide valid user ID." });
   }
 
@@ -666,11 +666,11 @@ app.post("/delete-comment-like", verifySession, async (req, res) => {
   const { commentId } = req.body;
   const { userId } = req;
 
-  if (!isIdValid(commentId)) {
+  if (isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
-  if (!isIdValid(userId)) {
+  if (isIdValid(userId)) {
     return res.status(400).json({ message: "Provide valid user ID." });
   }
 
@@ -694,7 +694,7 @@ app.post("/delete-comment-like", verifySession, async (req, res) => {
 app.get("/get-comment-likes", verifySession, async (req, res) => {
   const { commentId } = req.query;
 
-  if (!isIdValid(commentId)) {
+  if (isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
@@ -717,7 +717,7 @@ app.get("/get-comment-likes", verifySession, async (req, res) => {
 app.get("/other-user-data", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
 
-  if (!isIdValid(otherUserId)) {
+  if (isIdValid(otherUserId)) {
     return res.status(400).json({ message: "Provide valid user ID." });
   }
 
@@ -737,11 +737,11 @@ app.get("/other-user-data", verifySession, async (req, res) => {
 app.get("/chat-messages", verifySession, async (req, res) => {
   const { receiverId, senderId } = req.query;
 
-  if (!isIdValid(receiverId)) {
+  if (isIdValid(receiverId)) {
     return res.status(400).json({ message: "Provide valid receiver ID." });
   }
 
-  if (!isIdValid(senderId)) {
+  if (isIdValid(senderId)) {
     return res.status(400).json({ message: "Provide valid sender ID." });
   }
 
@@ -761,11 +761,11 @@ app.get("/chat-messages", verifySession, async (req, res) => {
 app.post("/send-message", verifySession, async (req, res) => {
   const { receiverId, senderId, content, messageDate } = req.body;
 
-  if (!isIdValid(receiverId)) {
+  if (isIdValid(receiverId)) {
     return res.status(400).json({ message: "Provide valid receiver ID." });
   }
 
-  if (!isIdValid(senderId)) {
+  if (isIdValid(senderId)) {
     return res.status(400).json({ message: "Provide valid sender ID." });
   }
 
@@ -786,7 +786,7 @@ app.post("/user-register", async (req, res) => {
     req.body;
 
   if (!email || !password) {
-    return res.status(401).json({ message: "Email and password are required" });
+    return res.status(400).json({ message: "Email and password are required" });
   }
 
   if (!EMAIL_REGEX.test(email)) {
@@ -803,17 +803,7 @@ app.post("/user-register", async (req, res) => {
     });
   }
 
-  if (
-    !surname ||
-    surname.length > MAX_STRING_LENGTH ||
-    surname.length === 0 ||
-    !birthdate ||
-    !gender ||
-    !country ||
-    !city ||
-    city.length > MAX_STRING_LENGTH ||
-    city.length === 0
-  ) {
+  if (isUserDataValid(name, surname, email, birthdate, gender, country, city)) {
     return res.status(400).json({
       message:
         "One of the mandatory fields is empty or incorrect, please fill your data.",
@@ -824,6 +814,16 @@ app.post("/user-register", async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const existingUser = db
+      .prepare("SELECT id FROM users WHERE email = ?")
+      .get(email);
+
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ message: "User with this email already exists" });
+    }
 
     const createdUser = db
       .prepare(
@@ -851,7 +851,28 @@ app.post("/update-user-data", verifySession, async (req, res) => {
   const { name, surname, email, birthdate, gender, country, city } = req.body;
   const { userId } = req;
 
+  if (isIdValid(userId)) {
+    return res.status(400).json({ message: "Provide valid user ID." });
+  }
+
+  if (isUserDataValid(name, surname, email, birthdate, gender, country, city)) {
+    return res.status(400).json({
+      message:
+        "One of the mandatory fields is empty or incorrect, please fill your data.",
+    });
+  }
+
   try {
+    const existingUser = db
+      .prepare("SELECT id FROM users WHERE email = ?")
+      .get(email);
+
+    if (existingUser && existingUser.id !== userId) {
+      return res
+        .status(409)
+        .json({ message: "Email is already in use by another account" });
+    }
+
     const update = db
       .prepare(
         "UPDATE users SET name = ?, surname = ?, email = ?, birthdate = ?, gender = ?, country = ?, city = ? WHERE id = ?"
@@ -874,6 +895,12 @@ app.post("/user-login", async (req, res) => {
     const foundUser = db
       .prepare("SELECT password, id FROM users WHERE email = ?")
       .get(email);
+
+    if (!foundUser) {
+      return res
+        .status(401)
+        .json({ message: "Email or password is incorrect" });
+    }
 
     const comparePasswordsResult = await bcrypt.compare(
       password,
