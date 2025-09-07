@@ -36,6 +36,10 @@ function initDb() {
   db.prepare(
     "CREATE TABLE IF NOT EXISTS profile_pictures (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, content BLOB NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)"
   ).run();
+
+  db.prepare(
+    "CREATE TABLE IF NOT EXISTS user_relationship (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, user_first_id INTEGER NOT NULL, user_second_id INTEGER NOT NULL, type TEXT, status TEXT, FOREIGN KEY (user_first_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY (user_second_id) REFERENCES users(id) ON DELETE CASCADE, UNIQUE (user_first_id, user_second_id))"
+  ).run();
 }
 
 initDb();

@@ -917,6 +917,33 @@ app.post("/user-login", async (req, res) => {
   }
 });
 
+app.get("/friends-list", async (req, res) => {
+  const { userId } = req;
+
+  if (isIdValid(userId)) {
+    return res.status(400).json({ message: "Provide valid user ID." });
+  }
+
+  try {
+    const friendsList = db
+      .prepare(
+        `
+      SELECT u.id, u.name, u.surname, u.email
+        FROM users u
+        JOIN user_relationship r ON 
+          (u.id = r.user_first_id AND r.user_second_id = ?)
+          OR (u.id = r.user_second_id AND r.user_first_id = ?)
+      WHERE r.status = 'accepted'
+    `
+      )
+      .all(userId);
+
+    res.status(200).json({ friend: friendsList });
+  } catch (err) {
+    res.status(500).json({ message: "Couldn't retrieve friends list", err });
+  }
+});
+
 app.listen(8080);
 
 export default db;
