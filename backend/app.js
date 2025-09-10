@@ -58,7 +58,7 @@ server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
-app.get("/user-data", (req, res) => {
+app.get("/user-data", verifySession, (req, res) => {
   const authSessionFound = req.cookies.auth_session;
   const foundSession = db
     .prepare("SELECT user_id FROM sessions WHERE id = ?")
@@ -72,7 +72,7 @@ app.get("/user-data", (req, res) => {
   return res.status(200).json(foundUserData);
 });
 
-app.get("/user-id", (req, res) => {
+app.get("/user-id", verifySession, (req, res) => {
   const authSessionFound = req.cookies.auth_session;
   const foundSession = db
     .prepare("SELECT user_id FROM sessions WHERE id = ?")
@@ -90,7 +90,7 @@ app.get("/verify-user", verifySession, (req, res) => {
 app.get("/all-users", verifySession, (req, res) => {
   const { userId } = req;
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).send("Invalid user ID");
   }
 
@@ -105,7 +105,7 @@ app.get("/all-users", verifySession, (req, res) => {
   }
 });
 
-app.post("/user-logout", async (req, res) => {
+app.post("/user-logout", verifySession, async (req, res) => {
   const authSessionFound = req.cookies.auth_session;
 
   if (!authSessionFound || typeof authSessionFound !== "string") {
@@ -132,7 +132,7 @@ app.post("/user-post", verifySession, async (req, res) => {
   const { content, post_date } = req.body;
   const { userId } = req;
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provided valid user ID" });
   }
 
@@ -194,7 +194,7 @@ app.get("/user-posts", verifySession, async (req, res) => {
   const { userId } = req;
   const userPostsLimit = 3;
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provided pvalid user ID" });
   }
 
@@ -214,7 +214,7 @@ app.get("/user-posts", verifySession, async (req, res) => {
 app.get("/single-post", verifySession, async (req, res) => {
   const { postId } = req.query;
 
-  if (isIdValid(postId)) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -234,7 +234,7 @@ app.get("/single-post", verifySession, async (req, res) => {
 app.get("/other-user-posts", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
 
-  if (isIdValid(otherUserId)) {
+  if (!isIdValid(otherUserId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -254,7 +254,7 @@ app.get("/other-user-posts", verifySession, async (req, res) => {
 app.get("/get-likes", verifySession, async (req, res) => {
   const { postId } = req.query;
 
-  if (isIdValid(postId)) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -272,7 +272,7 @@ app.get("/get-likes", verifySession, async (req, res) => {
 app.get("/get-comments", verifySession, async (req, res) => {
   const { postId } = req.query;
 
-  if (isIdValid(postId)) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -319,11 +319,11 @@ app.post("/post-like", verifySession, async (req, res) => {
   const { postId } = req.body;
   const { userId } = req;
 
-  if (isIdValid(postId)) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
@@ -348,11 +348,11 @@ app.post("/delete-like", verifySession, async (req, res) => {
   const { postId } = req.body;
   const { userId } = req;
 
-  if (isIdValid(postId)) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
@@ -370,7 +370,7 @@ app.post("/delete-like", verifySession, async (req, res) => {
 app.post("/delete-post", verifySession, async (req, res) => {
   const { postId } = req.body;
 
-  if (isIdValid(postId)) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -386,11 +386,11 @@ app.post("/post-comment", verifySession, async (req, res) => {
   const { postId, content, comment_date } = req.body;
   const { userId } = req;
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
-  if (isIdValid(postId)) {
+  if (!isIdValid(postId)) {
     return res.status(400).json({ message: "Invalid Post ID!" });
   }
 
@@ -440,7 +440,7 @@ app.post("/post-picture", verifySession, async (req, res) => {
   const { userId } = req;
   const { content } = req.body;
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID!" });
   }
 
@@ -484,10 +484,10 @@ app.post("/post-picture", verifySession, async (req, res) => {
 });
 
 app.get("/get-picture", verifySession, async (req, res) => {
-  const ownPicture = req.query.ownPicture === "true"; //convertin string into boolean
+  const ownPicture = req.query.ownPicture === "true"; //converting string into boolean
   let { userId } = req.query;
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Missing userId." });
   }
 
@@ -520,7 +520,7 @@ app.post("/change-password", verifySession, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const { userId } = req;
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provide user ID." });
   }
 
@@ -596,7 +596,7 @@ app.post("/change-password", verifySession, async (req, res) => {
 app.post("/delete-comment", verifySession, async (req, res) => {
   const { commentId } = req.body;
 
-  if (isIdValid(commentId)) {
+  if (!isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
@@ -619,11 +619,11 @@ app.post("/comment-like", verifySession, async (req, res) => {
   const { commentId } = req.body;
   const { userId } = req;
 
-  if (isIdValid(commentId)) {
+  if (!isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provide valid user ID." });
   }
 
@@ -666,11 +666,11 @@ app.post("/delete-comment-like", verifySession, async (req, res) => {
   const { commentId } = req.body;
   const { userId } = req;
 
-  if (isIdValid(commentId)) {
+  if (!isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provide valid user ID." });
   }
 
@@ -694,7 +694,7 @@ app.post("/delete-comment-like", verifySession, async (req, res) => {
 app.get("/get-comment-likes", verifySession, async (req, res) => {
   const { commentId } = req.query;
 
-  if (isIdValid(commentId)) {
+  if (!isIdValid(commentId)) {
     return res.status(400).json({ message: "Provide valid comment ID." });
   }
 
@@ -717,7 +717,7 @@ app.get("/get-comment-likes", verifySession, async (req, res) => {
 app.get("/other-user-data", verifySession, async (req, res) => {
   const { otherUserId } = req.query;
 
-  if (isIdValid(otherUserId)) {
+  if (!isIdValid(otherUserId)) {
     return res.status(400).json({ message: "Provide valid user ID." });
   }
 
@@ -737,11 +737,11 @@ app.get("/other-user-data", verifySession, async (req, res) => {
 app.get("/chat-messages", verifySession, async (req, res) => {
   const { receiverId, senderId } = req.query;
 
-  if (isIdValid(receiverId)) {
+  if (!isIdValid(receiverId)) {
     return res.status(400).json({ message: "Provide valid receiver ID." });
   }
 
-  if (isIdValid(senderId)) {
+  if (!isIdValid(senderId)) {
     return res.status(400).json({ message: "Provide valid sender ID." });
   }
 
@@ -761,11 +761,11 @@ app.get("/chat-messages", verifySession, async (req, res) => {
 app.post("/send-message", verifySession, async (req, res) => {
   const { receiverId, senderId, content, messageDate } = req.body;
 
-  if (isIdValid(receiverId)) {
+  if (!isIdValid(receiverId)) {
     return res.status(400).json({ message: "Provide valid receiver ID." });
   }
 
-  if (isIdValid(senderId)) {
+  if (!isIdValid(senderId)) {
     return res.status(400).json({ message: "Provide valid sender ID." });
   }
 
@@ -781,7 +781,7 @@ app.post("/send-message", verifySession, async (req, res) => {
   }
 });
 
-app.post("/user-register", async (req, res) => {
+app.post("/user-register", verifySession, async (req, res) => {
   const { name, surname, email, password, birthdate, gender, country, city } =
     req.body;
 
@@ -851,7 +851,7 @@ app.post("/update-user-data", verifySession, async (req, res) => {
   const { name, surname, email, birthdate, gender, country, city } = req.body;
   const { userId } = req;
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provide valid user ID." });
   }
 
@@ -884,7 +884,7 @@ app.post("/update-user-data", verifySession, async (req, res) => {
   }
 });
 
-app.post("/user-login", async (req, res) => {
+app.post("/user-login", verifySession, async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -917,10 +917,10 @@ app.post("/user-login", async (req, res) => {
   }
 });
 
-app.get("/friends-list", async (req, res) => {
+app.get("/friends-list", verifySession, async (req, res) => {
   const { userId } = req;
 
-  if (isIdValid(userId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provide valid user ID." });
   }
 
@@ -939,6 +939,46 @@ app.get("/friends-list", async (req, res) => {
       .all(userId);
 
     res.status(200).json({ friend: friendsList });
+  } catch (err) {
+    res.status(500).json({ message: "Couldn't retrieve friends list", err });
+  }
+});
+
+app.post("/send-friend-request", verifySession, async (req, res) => {
+  const { userId } = req;
+  const { friendId } = req.body;
+
+  const relationshipType = "friends";
+  const relationshipStatus = "pending";
+
+  if (!isIdValid(userId)) {
+    return res.status(400).json({ message: "Provide valid user ID." });
+  }
+
+  if (!isIdValid(friendId)) {
+    return res.status(400).json({ message: "Provide valid friend ID." });
+  }
+
+  const existing = db
+    .prepare(
+      "SELECT * FROM user_relationship WHERE (user_first_id = ? AND user_second_id = ?) OR (user_second_id = ? AND user_first_id = ?)"
+    )
+    .get(userId, friendId, friendId, userId);
+
+  if (existing) {
+    return res.status(400).json({
+      message: "Friend request already exists or you're already friends.",
+    });
+  }
+
+  try {
+    const friendsList = db
+      .prepare(
+        "INSERT INTO user_relationship (user_first_id, user_second_id, type, status) VALUES (?, ?, ?, ?)"
+      )
+      .run(userId, friendId, relationshipType, relationshipStatus);
+
+    res.status(200).json({ message: "Friend request has been sent" });
   } catch (err) {
     res.status(500).json({ message: "Couldn't retrieve friends list", err });
   }

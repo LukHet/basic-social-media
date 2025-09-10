@@ -3,7 +3,7 @@ export function isBase64PngorJpg(dataUri) {
 }
 
 export function isIdValid(id) {
-  return !id || id.trim().length === 0 || typeof id !== "number" || id < 0;
+  return id || id.trim().length !== 0 || typeof id === "number" || id >= 0;
 }
 
 export function isUserDataValid(
