@@ -34,3 +34,9 @@ export function isUserDataValid(
     !EMAIL_REGEX.test(email)
   );
 }
+
+export const relationshipTypeFriends = "friends";
+export const relationshipStatusBlocked = "blocked";
+export const relationshipStatusPending = "pending";
+export const relationshipStatusDeclined = "declined";
+export const relationshipStatusApproved = "accepted";
