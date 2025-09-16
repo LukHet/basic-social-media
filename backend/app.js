@@ -28,6 +28,7 @@ import {
   relationshipStatusDeclined,
   relationshipStatusPending,
   relationshipTypeFriends,
+  relationshipTypeNone,
 } from "./helpers.js";
 import { use } from "react";
 
@@ -979,7 +980,7 @@ app.post("/send-friend-request", verifySession, async (req, res) => {
   }
 
   try {
-    const friendsList = db
+    const sendFriendRequest = db
       .prepare(
         `INSERT INTO user_relationship (user_first_id, user_second_id, type, status) VALUES (?, ?, ?, ?)`
       )
@@ -1021,7 +1022,7 @@ app.post("/accept-friend-request", verifySession, async (req, res) => {
   }
 
   try {
-    const friendsList = db
+    const acceptFriendRequest = db
       .prepare(
         `UPDATE user_relationship (type, status) VALUES (?, ?, ?, ?) WHERE (user_first_id = ? AND user_second_id = ?) OR (user_second_id = ? AND user_first_id = ?)`
       )
@@ -1067,7 +1068,7 @@ app.post("/decline-friend-request", verifySession, async (req, res) => {
   }
 
   try {
-    const friendsList = db
+    const declineFriendRequest = db
       .prepare(
         `UPDATE user_relationship (type, status) VALUES (?, ?, ?, ?) WHERE (user_first_id = ? AND user_second_id = ?) OR (user_second_id = ? AND user_first_id = ?)`
       )
@@ -1113,7 +1114,7 @@ app.post("/block-user", verifySession, async (req, res) => {
   }
 
   try {
-    const friendsList = db
+    const blockUser = db
       .prepare(
         `UPDATE user_relationship (type, status) VALUES (?, ?, ?, ?) WHERE (user_first_id = ? AND user_second_id = ?) OR (user_second_id = ? AND user_first_id = ?)`
       )
@@ -1129,6 +1130,50 @@ app.post("/block-user", verifySession, async (req, res) => {
     res.status(200).json({ message: "User has been blocked" });
   } catch (err) {
     res.status(500).json({ message: "Couldn't block the user", err });
+  }
+});
+
+app.post("/delete-user-from-friendslist", verifySession, async (req, res) => {
+  const { userId } = req;
+  const { friendId } = req.body;
+
+  if (!isIdValid(userId)) {
+    return res.status(400).json({ message: "Provide valid user ID." });
+  }
+
+  if (!isIdValid(friendId)) {
+    return res.status(400).json({ message: "Provide valid friend ID." });
+  }
+
+  const existing = db
+    .prepare(
+      "SELECT * FROM user_relationship WHERE ((user_first_id = ? AND user_second_id = ?) OR (user_second_id = ? AND user_first_id = ?)) AND type = ?"
+    )
+    .get(userId, friendId, friendId, userId, relationshipTypeFriends);
+
+  if (!existing) {
+    return res.status(400).json({
+      message: "User was not on friendslist or has already been unfriended.",
+    });
+  }
+
+  try {
+    const deleteUserFromFriendslist = db
+      .prepare(
+        `UPDATE user_relationship (type, status) VALUES (?, ?, ?, ?) WHERE (user_first_id = ? AND user_second_id = ?) OR (user_second_id = ? AND user_first_id = ?)`
+      )
+      .run(
+        relationshipTypeNone,
+        relationshipStatusDeclined,
+        userId,
+        friendId,
+        friendId,
+        userId
+      );
+
+    res.status(200).json({ message: "User has been deleted from friendslist" });
+  } catch (err) {
+    res.status(500).json({ message: "Couldn't delete from friendslist", err });
   }
 });
 

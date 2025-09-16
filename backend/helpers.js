@@ -36,6 +36,7 @@ export function isUserDataValid(
 }
 
 export const relationshipTypeFriends = "friends";
+export const relationshipTypeNone = "none";
 export const relationshipStatusBlocked = "blocked";
 export const relationshipStatusPending = "pending";
 export const relationshipStatusDeclined = "declined";
