@@ -792,7 +792,7 @@ app.post("/send-message", verifySession, async (req, res) => {
   }
 });
 
-app.post("/user-register", verifySession, async (req, res) => {
+app.post("/user-register", async (req, res) => {
   const { name, surname, email, password, birthdate, gender, country, city } =
     req.body;
 
@@ -895,7 +895,7 @@ app.post("/update-user-data", verifySession, async (req, res) => {
   }
 });
 
-app.post("/user-login", verifySession, async (req, res) => {
+app.post("/user-login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {

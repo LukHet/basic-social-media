@@ -1,9 +1,11 @@
+import { MAX_STRING_LENGTH, EMAIL_REGEX } from "../constants/app-info.js";
+
 export function isBase64PngorJpg(dataUri) {
   return /^data:image\/(jpeg|jpg|png);base64/i.test(dataUri);
 }
 
 export function isIdValid(id) {
-  return id || id.trim().length !== 0 || typeof id === "number" || id >= 0;
+  return id || id >= 0;
 }
 
 export function isUserDataValid(
