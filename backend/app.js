@@ -498,16 +498,16 @@ app.get("/get-picture", verifySession, async (req, res) => {
   const ownPicture = req.query.ownPicture === "true"; //converting string into boolean
   let { userId } = req.query;
 
+  if (ownPicture) {
+    userId = req.userId;
+  }
+
   if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Missing userId." });
   }
 
-  if (!ownPicture && userId !== req.userId) {
+  if (!ownPicture && String(userId) !== String(req.userId)) {
     return res.status(403).json({ message: "Forbidden. Access denied." });
-  }
-
-  if (ownPicture) {
-    userId = req.userId;
   }
 
   try {
@@ -516,7 +516,7 @@ app.get("/get-picture", verifySession, async (req, res) => {
       .get(userId);
 
     if (!foundPicture) {
-      return res.status(404).json({ message: "Picture not available." });
+      return res.status(204).json({ message: "Picture not available." });
     }
 
     return res.status(200).json(foundPicture);

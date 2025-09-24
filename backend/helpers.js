@@ -5,7 +5,9 @@ export function isBase64PngorJpg(dataUri) {
 }
 
 export function isIdValid(id) {
-  return id || id >= 0;
+  return (
+    typeof id === "number" || (typeof id === "string" && id.trim().length > 0)
+  );
 }
 
 export function isUserDataValid(

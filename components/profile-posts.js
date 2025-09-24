@@ -25,6 +25,21 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
     }
   };
 
+  const deletePost = async (post_id) => {
+    try {
+      const res = await axios.post(
+        APIURL + "/delete-post",
+        {
+          postId: post_id,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      await getPosts();
+    } catch (err) {}
+  };
+
   const getUserData = async () => {
     try {
       const response = await axios.get(APIURL + "/user-data", {
@@ -51,7 +66,14 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
           : "No profile posts found!"}
       </h1>
       {posts.length !== 0 &&
-        posts.map((post) => <Post post={post} key={post.id} userId={userId} />)}
+        posts.map((post) => (
+          <Post
+            post={post}
+            key={post.id}
+            userId={userId}
+            deletePost={() => deletePost(post.id)}
+          />
+        ))}
     </div>
   );
 }
