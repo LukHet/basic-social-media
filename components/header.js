@@ -80,14 +80,12 @@ export default function Header({ inLoginButtonVisible }) {
   }, [searchValue]);
 
   const logout = async () => {
-    await axios
-      .post(APIURL + "/user-logout", {
-        withCredentials: true,
-      })
-      .then((res) => router.push("/main-page"))
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      await axios.post(APIURL + "/user-logout", {}, { withCredentials: true });
+      router.push("/main-page");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleSearch = (e) => {

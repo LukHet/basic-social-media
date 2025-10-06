@@ -306,9 +306,11 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
                   </div>
                 )
             )}
-            <div className="flex">
-              <Button label="Change password" href="/change-password" />
-            </div>
+            {isOwnProfile ? (
+              <div className="flex">
+                <Button label="Change password" href="/change-password" />
+              </div>
+            ) : null}
           </div>
           {isOwnProfile ? (
             <>

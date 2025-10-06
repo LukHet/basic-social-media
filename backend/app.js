@@ -506,10 +506,6 @@ app.get("/get-picture", verifySession, async (req, res) => {
     return res.status(400).json({ message: "Missing userId." });
   }
 
-  if (!ownPicture && String(userId) !== String(req.userId)) {
-    return res.status(403).json({ message: "Forbidden. Access denied." });
-  }
-
   try {
     const foundPicture = db
       .prepare("SELECT content FROM profile_pictures WHERE user_id = ?")
