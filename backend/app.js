@@ -262,6 +262,42 @@ app.get("/other-user-posts", verifySession, async (req, res) => {
   }
 });
 
+app.get("/friends-posts", verifySession, async (req, res) => {
+  const { userId } = req;
+
+  if (!isIdValid(userId)) {
+    return res.status(400).json({ message: "Invalid user ID!" });
+  }
+
+  try {
+    const friendsPosts = db
+      .prepare(
+        `
+        SELECT p.id, p.user_id, p.author, p.post_date, p.content
+          FROM posts p
+          JOIN users_relationship u ON           
+          (p.id = r.user_first_id AND p.user_second_id = ?)
+          OR (u.id = p.user_second_id AND p.user_first_id = ?)
+          WHERE r.status = ? AND r.type = ?
+          ORDER BY post_date DESC LIMIT ? OFFSET ?
+    `
+      )
+      .all(
+        userId,
+        userId,
+        relationshipStatusApproved,
+        relationshipTypeFriends,
+        postsLimit,
+        postsOffset
+      );
+    return res.status(200).json(friendsPosts);
+  } catch (e) {
+    return res
+      .status(404)
+      .json({ message: "Couldn't get friends posts: ", err });
+  }
+});
+
 app.get("/get-likes", verifySession, async (req, res) => {
   const { postId } = req.query;
 
@@ -940,10 +976,10 @@ app.get("/friends-list", verifySession, async (req, res) => {
         JOIN user_relationship r ON 
           (u.id = r.user_first_id AND r.user_second_id = ?)
           OR (u.id = r.user_second_id AND r.user_first_id = ?)
-      WHERE r.status = 'accepted'
+      WHERE r.status = ?
     `
       )
-      .all(userId);
+      .all(userId, relationshipStatusApproved);
 
     res.status(200).json({ friend: friendsList });
   } catch (err) {
@@ -1020,7 +1056,9 @@ app.post("/accept-friend-request", verifySession, async (req, res) => {
   try {
     const acceptFriendRequest = db
       .prepare(
-        `UPDATE user_relationship (type, status) VALUES (?, ?, ?, ?) WHERE (user_first_id = ? AND user_second_id = ?) OR (user_second_id = ? AND user_first_id = ?)`
+        `UPDATE user_relationship (type, status) 
+        VALUES (?, ?, ?, ?) 
+        WHERE (user_first_id = ? AND user_second_id = ?) OR (user_second_id = ? AND user_first_id = ?)`
       )
       .run(
         relationshipTypeFriends,
