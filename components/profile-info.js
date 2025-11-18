@@ -15,6 +15,7 @@ import DateInput from "./date-input";
 import SelectInput from "./select-input";
 import countries from "@/constants/countries.json";
 import PicturePopup from "./picture-popup";
+import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
 export default function ProfileInfo({ isOwnProfile, slug }) {
   const [userInfo, setUserInfo] = useState([]);
@@ -111,7 +112,7 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
     }
 
     try {
-      const res = await axios.post(
+      apiPostData(
         APIURL + "/update-user-data",
         {
           name: name,
@@ -122,9 +123,7 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
           city: city,
           email: mail,
         },
-        {
-          withCredentials: true,
-        }
+        true
       );
       setUpdateInfo("Your data has been changed!");
       getUserInfo();

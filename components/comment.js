@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import PostComments from "./post-comments";
 import { APIURL, MAX_COMMENT_LENGTH } from "@/constants/app-info";
+import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
 export default function Comment({ postId, userId, isOwnPost }) {
   const [comment, setComment] = useState("");
@@ -29,22 +30,24 @@ export default function Comment({ postId, userId, isOwnPost }) {
         withCredentials: true,
       });
       setPostComments(res.data);
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const deleteComment = async (commentId) => {
     try {
-      const res = await axios.post(
+      const res = await apiPostData(
         APIURL + "/delete-comment",
         {
           commentId: commentId,
         },
-        {
-          withCredentials: true,
-        }
+        true
       );
       await getPostComments();
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const postComment = async () => {
@@ -63,17 +66,16 @@ export default function Comment({ postId, userId, isOwnPost }) {
       .toISOString()
       .slice(0, 19)
       .replace("T", " ");
+
     try {
-      const res = await axios.post(
+      const res = await apiPostData(
         APIURL + "/post-comment",
         {
           content: comment,
           postId: postId,
           comment_date: formattedCurrentDate,
         },
-        {
-          withCredentials: true,
-        }
+        true
       );
       await getPostComments();
       setComment("");

@@ -6,6 +6,7 @@ import Image from "next/image";
 import LikesTooltip from "./likes-popup";
 import { APIURL } from "@/constants/app-info";
 import PostLikesPopup from "./post-likes-popup";
+import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
 export default function Like({ postId, userId }) {
   const [imgSrc, setImgSrc] = useState("/heart.png");
@@ -27,12 +28,12 @@ export default function Like({ postId, userId }) {
   const handleHeartClick = async () => {
     if (isLiked) {
       try {
-        const response = await axios.post(
+        apiPostData(
           APIURL + "/delete-like",
           {
             postId: postId,
           },
-          { withCredentials: true }
+          true
         );
         setIsLiked(false);
         getLikes();
@@ -44,12 +45,12 @@ export default function Like({ postId, userId }) {
     }
 
     try {
-      const response = await axios.post(
+      await apiPostData(
         APIURL + "/post-like",
         {
           postId: postId,
         },
-        { withCredentials: true }
+        true
       );
       setIsLiked(true);
       getLikes();

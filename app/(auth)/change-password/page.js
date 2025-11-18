@@ -9,6 +9,7 @@ import {
   APIURL,
 } from "@/constants/app-info";
 import axios from "axios";
+import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
 export default function ChangePassword() {
   const [oldPassword, setOldPassword] = useState("");
@@ -38,15 +39,13 @@ export default function ChangePassword() {
 
   const handleButtonClick = async () => {
     try {
-      const res = await axios.post(
+      const res = await apiPostData(
         APIURL + "/change-password",
         {
           oldPassword: oldPassword,
           newPassword: newPassword,
         },
-        {
-          withCredentials: true,
-        }
+        true
       );
       setStatusMessage(res?.data?.message);
     } catch (err) {

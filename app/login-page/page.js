@@ -7,6 +7,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { APIURL, EMAIL_REGEX } from "@/constants/app-info";
+import { apiPostData } from "../apiConnectors/apiPostData";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -37,17 +38,15 @@ export default function LoginPage() {
     }
 
     e.preventDefault();
-    await axios
-      .post(
-        APIURL + "/user-login",
-        {
-          email: email,
-          password: password,
-        },
-        {
-          withCredentials: true,
-        }
-      )
+
+    await apiPostData(
+      APIURL + "/user-login",
+      {
+        email: email,
+        password: password,
+      },
+      true
+    )
       .then((res) => router.push("/main-page"))
       .catch((err) => {
         if (err.response && err.response.data) {

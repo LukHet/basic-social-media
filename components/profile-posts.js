@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Post from "./post";
 import { APIURL } from "@/constants/app-info";
+import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
 export default function ProfilePosts({ isOwnProfile, slug }) {
   const [posts, setPosts] = useState([]);
@@ -27,17 +28,17 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
 
   const deletePost = async (post_id) => {
     try {
-      const res = await axios.post(
+      await apiPostData(
         APIURL + "/delete-post",
         {
           postId: post_id,
         },
-        {
-          withCredentials: true,
-        }
+        true
       );
       await getPosts();
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const getUserData = async () => {

@@ -6,6 +6,7 @@ import TextArea from "./text-area";
 import Button from "./button";
 import Post from "./post";
 import { APIURL, MAX_POST_LENGTH } from "@/constants/app-info";
+import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
 export default function PostInput() {
   const [postValue, setPostValue] = useState("");
@@ -59,15 +60,13 @@ export default function PostInput() {
       .slice(0, 19)
       .replace("T", " ");
     try {
-      const res = await axios.post(
+      const res = await apiPostData(
         APIURL + "/user-post",
         {
           content: postValue,
           post_date: formattedCurrentDate,
         },
-        {
-          withCredentials: true,
-        }
+        true
       );
       setPostValue("");
       setPostInfo(res?.data?.message);
@@ -79,17 +78,17 @@ export default function PostInput() {
 
   const deletePost = async (post_id) => {
     try {
-      const res = await axios.post(
+      await apiPostData(
         APIURL + "/delete-post",
         {
           postId: post_id,
         },
-        {
-          withCredentials: true,
-        }
+        true
       );
       await getPosts();
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (

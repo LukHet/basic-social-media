@@ -10,6 +10,7 @@ import {
 } from "@/constants/app-info";
 import Image from "next/image";
 import axios from "axios";
+import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
 export default function PicturePopup({ onClose }) {
   const [file, setFile] = useState(null);
@@ -50,13 +51,7 @@ export default function PicturePopup({ onClose }) {
     if (!file) return;
     const base64DataUrl = await toBase64(file);
     try {
-      const res = await axios.post(
-        APIURL + "/post-picture",
-        { content: base64DataUrl },
-        {
-          withCredentials: true,
-        }
-      );
+      apiPostData(APIURL + "/post-picture", { content: base64DataUrl }, true);
       setErrorMessage("New profile picture has been uploaded!");
       window.location.reload();
     } catch (err) {

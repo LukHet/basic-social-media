@@ -14,6 +14,7 @@ import {
   EMAIL_REGEX,
   GENDER_OPTIONS,
 } from "@/constants/app-info";
+import { apiPostData } from "../apiConnectors/apiPostData";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -85,7 +86,7 @@ export default function RegisterPage() {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
+      const res = await apiPostData(
         APIURL + "/user-register",
         {
           name: name,
@@ -97,11 +98,10 @@ export default function RegisterPage() {
           email: email,
           password: password,
         },
-        {
-          withCredentials: true,
-        }
-      );
-      router.push("/main-page");
+        true
+      ).then((res) => {
+        router.push("/main-page");
+      });
     } catch (err) {
       if (err.response && err.response.data) {
         const message = err.response.data.message || "An error occurred";

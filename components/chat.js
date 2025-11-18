@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { socket } from "@/app/socket";
 import axios from "axios";
 import { APIURL } from "@/constants/app-info";
+import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
 export default function Chat({ chatParameters }) {
   const [isConnected, setIsConnected] = useState(false);
@@ -74,7 +75,7 @@ export default function Chat({ chatParameters }) {
       .slice(0, 19)
       .replace("T", " ");
     try {
-      const res = await axios.post(
+      const res = await apiPostData(
         APIURL + "/send-message",
         {
           receiverId: message.receiverId,
@@ -82,9 +83,7 @@ export default function Chat({ chatParameters }) {
           content: message.message,
           messageDate: formattedCurrentDate,
         },
-        {
-          withCredentials: true,
-        }
+        true
       );
       await getMessages();
     } catch (err) {
@@ -99,7 +98,7 @@ export default function Chat({ chatParameters }) {
       .slice(0, 19)
       .replace("T", " ");
     try {
-      const res = await axios.post(
+      const res = apiPostData(
         APIURL + "/send-message",
         {
           receiverId: receiverId,
@@ -107,9 +106,7 @@ export default function Chat({ chatParameters }) {
           content: message,
           messageDate: formattedCurrentDate,
         },
-        {
-          withCredentials: true,
-        }
+        true
       );
       await getMessages();
     } catch (err) {

@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import SearchInput from "./search-input";
 import { APIURL } from "@/constants/app-info";
+import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
 export default function Header({ inLoginButtonVisible }) {
   const router = useRouter();
@@ -81,8 +82,9 @@ export default function Header({ inLoginButtonVisible }) {
 
   const logout = async () => {
     try {
-      await axios.post(APIURL + "/user-logout", {}, { withCredentials: true });
-      router.push("/main-page");
+      apiPostData(APIURL + "/user-logout", {}, true).then(() => {
+        router.push("/main-page");
+      });
     } catch (err) {
       console.log(err);
     }
