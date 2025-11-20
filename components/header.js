@@ -1,15 +1,14 @@
 "use client";
 
 import Button from "./button";
-import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SearchInput from "./search-input";
-import { APIURL } from "@/constants/app-info";
 import { apiPostData } from "@/app/apiConnectors/apiPostData";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function Header({ inLoginButtonVisible }) {
   const router = useRouter();
@@ -23,10 +22,8 @@ export default function Header({ inLoginButtonVisible }) {
 
     const userData = async () => {
       try {
-        const response = await axios.get(APIURL + "/user-data", {
-          withCredentials: true,
-        });
-        const foundName = response.data.name;
+        const response = await apiGetData("/user-data", {}, true);
+        const foundName = response?.data?.name;
         setUsername(foundName);
       } catch (err) {
         console.error(err);
@@ -35,10 +32,11 @@ export default function Header({ inLoginButtonVisible }) {
 
     const getProfilePicture = async () => {
       try {
-        const response = await axios.get(APIURL + "/get-picture", {
-          params: { ownPicture: true },
-          withCredentials: true,
-        });
+        const response = await apiGetData(
+          "/get-picture",
+          { ownPicture: true },
+          true
+        );
         if (response?.data?.content?.data) {
           const byteArray = new Uint8Array(response.data.content.data);
           const blob = new Blob([byteArray]);
@@ -67,10 +65,11 @@ export default function Header({ inLoginButtonVisible }) {
         return;
       }
       try {
-        const response = await axios.get(APIURL + "/search-users", {
-          params: { searchValue: searchValue },
-          withCredentials: true,
-        });
+        const response = await apiGetData(
+          "/search-users",
+          { searchValue: searchValue },
+          true
+        );
         setFoundUsers(response.data);
       } catch (err) {
         console.error(err);
@@ -82,9 +81,8 @@ export default function Header({ inLoginButtonVisible }) {
 
   const logout = async () => {
     try {
-      apiPostData(APIURL + "/user-logout", {}, true).then(() => {
-        router.push("/main-page");
-      });
+      await apiPostData("/user-logout", {}, true);
+      router.push("/main-page");
     } catch (err) {
       console.log(err);
     }

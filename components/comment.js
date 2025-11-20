@@ -3,10 +3,10 @@
 import Button from "./button";
 import TextInput from "./text-input";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import PostComments from "./post-comments";
-import { APIURL, MAX_COMMENT_LENGTH } from "@/constants/app-info";
+import { MAX_COMMENT_LENGTH } from "@/constants/app-info";
 import { apiPostData } from "@/app/apiConnectors/apiPostData";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function Comment({ postId, userId, isOwnPost }) {
   const [comment, setComment] = useState("");
@@ -25,11 +25,8 @@ export default function Comment({ postId, userId, isOwnPost }) {
 
   const getPostComments = async () => {
     try {
-      const res = await axios.get(APIURL + "/get-comments", {
-        params: { postId: postId },
-        withCredentials: true,
-      });
-      setPostComments(res.data);
+      const res = await apiGetData("/get-comments", { postId: postId }, true);
+      setPostComments(res?.data);
     } catch (err) {
       console.log(err);
     }
@@ -37,8 +34,8 @@ export default function Comment({ postId, userId, isOwnPost }) {
 
   const deleteComment = async (commentId) => {
     try {
-      const res = await apiPostData(
-        APIURL + "/delete-comment",
+      await apiPostData(
+        "/delete-comment",
         {
           commentId: commentId,
         },
@@ -68,8 +65,8 @@ export default function Comment({ postId, userId, isOwnPost }) {
       .replace("T", " ");
 
     try {
-      const res = await apiPostData(
-        APIURL + "/post-comment",
+      await apiPostData(
+        "/post-comment",
         {
           content: comment,
           postId: postId,

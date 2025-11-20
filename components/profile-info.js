@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Button from "./button";
 import TextInput from "./text-input";
 import Image from "next/image";
 import {
-  APIURL,
   MAX_STRING_LENGTH,
   EMAIL_REGEX,
   GENDER_OPTIONS,
@@ -16,6 +14,7 @@ import SelectInput from "./select-input";
 import countries from "@/constants/countries.json";
 import PicturePopup from "./picture-popup";
 import { apiPostData } from "@/app/apiConnectors/apiPostData";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function ProfileInfo({ isOwnProfile, slug }) {
   const [userInfo, setUserInfo] = useState([]);
@@ -39,10 +38,11 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
 
     const getProfilePicture = async () => {
       try {
-        const response = await axios.get(APIURL + "/get-picture", {
-          params: { ownPicture: isOwnProfile, userId: slug },
-          withCredentials: true,
-        });
+        const response = await apiGetData(
+          "/get-picture",
+          { ownPicture: isOwnProfile, userId: slug },
+          true
+        );
         if (response?.data?.content?.data) {
           const byteArray = new Uint8Array(response.data.content.data);
           const blob = new Blob([byteArray]);
@@ -69,14 +69,9 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
   const getUserInfo = async () => {
     try {
       const response = isOwnProfile
-        ? await axios.get(APIURL + "/user-data", {
-            withCredentials: true,
-          })
-        : await axios.get(APIURL + "/other-user-data", {
-            params: { otherUserId: slug },
-            withCredentials: true,
-          });
-      setUserInfo(response.data);
+        ? await apiGetData("/user-data", {}, true)
+        : await apiGetData("/other-user-data", { otherUserId: slug }, true);
+      setUserInfo(response?.data);
     } catch (err) {
       console.error(err);
     }
@@ -113,7 +108,7 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
 
     try {
       apiPostData(
-        APIURL + "/update-user-data",
+        "/update-user-data",
         {
           name: name,
           surname: surname,

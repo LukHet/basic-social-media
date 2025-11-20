@@ -1,9 +1,8 @@
 "use client";
 
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { APIURL } from "@/constants/app-info";
 import Post from "./post";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function SinglePost({ postId }) {
   const [post, setPost] = useState(null);
@@ -12,10 +11,11 @@ export default function SinglePost({ postId }) {
   useEffect(() => {
     const getSinglePost = async () => {
       try {
-        const response = await axios.get(APIURL + "/single-post", {
-          params: { postId: postId },
-          withCredentials: true,
-        });
+        const response = await apiGetData(
+          "/single-post",
+          { postId: postId },
+          true
+        );
         if (response?.data) {
           setPost(response.data);
         }
@@ -26,9 +26,7 @@ export default function SinglePost({ postId }) {
 
     const getUserData = async () => {
       try {
-        const response = await axios.get(APIURL + "/user-data", {
-          withCredentials: true,
-        });
+        const response = await apiGetData("/user-data", {}, true);
         setUserId(response?.data?.id);
       } catch (err) {
         console.log(err);

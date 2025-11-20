@@ -3,11 +3,7 @@
 import TextInput from "@/components/text-input";
 import Button from "@/components/button";
 import { useState, useEffect } from "react";
-import {
-  MIN_PASSWORD_LENGTH,
-  MAX_PASSWORD_LENGTH,
-  APIURL,
-} from "@/constants/app-info";
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from "@/constants/app-info";
 import axios from "axios";
 import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
@@ -40,7 +36,7 @@ export default function ChangePassword() {
   const handleButtonClick = async () => {
     try {
       const res = await apiPostData(
-        APIURL + "/change-password",
+        "/change-password",
         {
           oldPassword: oldPassword,
           newPassword: newPassword,

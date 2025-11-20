@@ -2,11 +2,10 @@
 
 import TextInput from "@/components/text-input";
 import Button from "@/components/button";
-import axios from "axios";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { APIURL, EMAIL_REGEX } from "@/constants/app-info";
+import { EMAIL_REGEX } from "@/constants/app-info";
 import { apiPostData } from "../apiConnectors/apiPostData";
 
 export default function LoginPage() {
@@ -40,7 +39,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     await apiPostData(
-      APIURL + "/user-login",
+      "/user-login",
       {
         email: email,
         password: password,

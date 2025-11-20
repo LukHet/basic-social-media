@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Image from "next/image";
 import LikesTooltip from "./likes-popup";
-import { APIURL } from "@/constants/app-info";
 import PostLikesPopup from "./post-likes-popup";
 import { apiPostData } from "@/app/apiConnectors/apiPostData";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function Like({ postId, userId }) {
   const [imgSrc, setImgSrc] = useState("/heart.png");
@@ -29,7 +28,7 @@ export default function Like({ postId, userId }) {
     if (isLiked) {
       try {
         apiPostData(
-          APIURL + "/delete-like",
+          "/delete-like",
           {
             postId: postId,
           },
@@ -46,7 +45,7 @@ export default function Like({ postId, userId }) {
 
     try {
       await apiPostData(
-        APIURL + "/post-like",
+        "/post-like",
         {
           postId: postId,
         },
@@ -61,11 +60,8 @@ export default function Like({ postId, userId }) {
 
   const getLikes = async () => {
     try {
-      const response = await axios.get(APIURL + "/get-likes", {
-        params: { postId: postId },
-        withCredentials: true,
-      });
-      setLikes(response.data);
+      const response = await apiGetData("/get-likes", { postId: postId }, true);
+      setLikes(response?.data);
     } catch (err) {
       console.error(err);
     }

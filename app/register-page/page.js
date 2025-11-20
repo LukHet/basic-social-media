@@ -2,14 +2,12 @@
 
 import TextInput from "@/components/text-input";
 import Button from "@/components/button";
-import axios from "axios";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DateInput from "@/components/date-input";
 import SelectInput from "@/components/select-input";
 import countries from "../../constants/countries.json";
 import {
-  APIURL,
   MAX_STRING_LENGTH,
   EMAIL_REGEX,
   GENDER_OPTIONS,
@@ -86,8 +84,8 @@ export default function RegisterPage() {
     e.preventDefault();
 
     try {
-      const res = await apiPostData(
-        APIURL + "/user-register",
+      await apiPostData(
+        "/user-register",
         {
           name: name,
           surname: surname,
@@ -99,9 +97,8 @@ export default function RegisterPage() {
           password: password,
         },
         true
-      ).then((res) => {
-        router.push("/main-page");
-      });
+      );
+      router.push("/main-page");
     } catch (err) {
       if (err.response && err.response.data) {
         const message = err.response.data.message || "An error occurred";

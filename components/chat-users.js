@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
-import { APIURL } from "@/constants/app-info";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function ChatUsers({ sidebar }) {
   const [availableUsers, setAvailableUsers] = useState([]);
@@ -12,9 +11,7 @@ export default function ChatUsers({ sidebar }) {
 
   const getAvailableUsers = async () => {
     try {
-      const response = await axios.get(APIURL + "/all-users", {
-        withCredentials: true,
-      });
+      const response = await apiGetData("/all-users", {}, true);
       setAvailableUsers(response?.data);
     } catch (err) {
       console.error(err);
@@ -23,9 +20,7 @@ export default function ChatUsers({ sidebar }) {
 
   const getUsersId = async () => {
     try {
-      const response = await axios.get(APIURL + "/user-data", {
-        withCredentials: true,
-      });
+      const response = await apiGetData("/user-data", {}, true);
       setUsersId(response?.data?.id);
     } catch (err) {
       console.error(err);

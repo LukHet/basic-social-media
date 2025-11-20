@@ -6,9 +6,8 @@ import Like from "./like";
 import CopyButton from "./copy-button";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { APIURL } from "@/constants/app-info";
 import { redirect } from "next/navigation";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function Post({ post, userId, deletePost }) {
   const [profileImage, setProfileImage] = useState(null);
@@ -43,10 +42,11 @@ export default function Post({ post, userId, deletePost }) {
 
   const getProfilePicture = async () => {
     try {
-      const response = await axios.get(APIURL + "/get-picture", {
-        params: { userId: post.user_id },
-        withCredentials: true,
-      });
+      const response = await apiGetData(
+        "/get-picture",
+        { userId: post.user_id },
+        true
+      );
       if (response?.data?.content?.data) {
         const byteArray = new Uint8Array(response.data.content.data);
         const blob = new Blob([byteArray]);

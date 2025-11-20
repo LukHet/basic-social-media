@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Post from "./post";
-import { APIURL } from "@/constants/app-info";
 import { apiPostData } from "@/app/apiConnectors/apiPostData";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function ProfilePosts({ isOwnProfile, slug }) {
   const [posts, setPosts] = useState([]);
@@ -13,13 +12,8 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
   const getPosts = async () => {
     try {
       const response = isOwnProfile
-        ? await axios.get(APIURL + "/user-posts", {
-            withCredentials: true,
-          })
-        : await axios.get(APIURL + "/other-user-posts", {
-            params: { otherUserId: slug },
-            withCredentials: true,
-          });
+        ? await apiGetData("/user-posts", {}, true)
+        : await apiGetData("/other-user-posts", { otherUserId: slug }, true);
       setPosts(response?.data);
     } catch (err) {
       console.error(err);
@@ -29,7 +23,7 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
   const deletePost = async (post_id) => {
     try {
       await apiPostData(
-        APIURL + "/delete-post",
+        "/delete-post",
         {
           postId: post_id,
         },
@@ -43,9 +37,7 @@ export default function ProfilePosts({ isOwnProfile, slug }) {
 
   const getUserData = async () => {
     try {
-      const response = await axios.get(APIURL + "/user-data", {
-        withCredentials: true,
-      });
+      const response = await apiGetData("/user-data", {}, true);
       setUserId(response?.data?.id);
     } catch (err) {
       console.log(err);

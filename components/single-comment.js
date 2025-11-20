@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import CommentLike from "./comment-like";
 import Image from "next/image";
-import axios from "axios";
-import { APIURL } from "@/constants/app-info";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function SingleComment({
   com,
@@ -41,10 +40,11 @@ export default function SingleComment({
 
   const getProfilePicture = async () => {
     try {
-      const response = await axios.get(APIURL + "/get-picture", {
-        params: { userId: com.user_id },
-        withCredentials: true,
-      });
+      const response = await apiGetData(
+        "/get-picture",
+        { userId: com.user_id },
+        true
+      );
       if (response?.data?.content?.data) {
         const byteArray = new Uint8Array(response.data.content.data);
         const blob = new Blob([byteArray]);

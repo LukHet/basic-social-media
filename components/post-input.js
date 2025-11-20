@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
 import TextArea from "./text-area";
 import Button from "./button";
 import Post from "./post";
-import { APIURL, MAX_POST_LENGTH } from "@/constants/app-info";
+import { MAX_POST_LENGTH } from "@/constants/app-info";
 import { apiPostData } from "@/app/apiConnectors/apiPostData";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function PostInput() {
   const [postValue, setPostValue] = useState("");
@@ -18,9 +18,7 @@ export default function PostInput() {
 
   const getPosts = async () => {
     try {
-      const response = await axios.get(APIURL + "/posts", {
-        withCredentials: true,
-      });
+      const response = await apiGetData("/posts", {}, true);
       setPosts(response?.data);
     } catch (err) {
       console.error(err);
@@ -29,10 +27,8 @@ export default function PostInput() {
 
   const getCurrentUsersId = async () => {
     try {
-      const response = await axios.get(APIURL + "/user-id", {
-        withCredentials: true,
-      });
-      setCurrentUserId(response.data);
+      const response = await apiGetData("/user-id", {}, true);
+      setCurrentUserId(response?.data);
     } catch (err) {
       console.error(err);
     }
@@ -44,10 +40,11 @@ export default function PostInput() {
   }, []);
 
   const onPostValueChange = (e) => {
-    setButtonDisabled(e.target.value.length === 0);
-    if (e.target.value.length >= MAX_POST_LENGTH + 1) return;
-    setPostValue(e.target.value);
-    setPostLength(e.target.value.length);
+    const postValue = e.target.value;
+    setButtonDisabled(postValue.length === 0);
+    if (postValue.length >= MAX_POST_LENGTH + 1) return;
+    setPostValue(postValue);
+    setPostLength(postValue.length);
   };
 
   const sendNewPost = async () => {
@@ -61,7 +58,7 @@ export default function PostInput() {
       .replace("T", " ");
     try {
       const res = await apiPostData(
-        APIURL + "/user-post",
+        "/user-post",
         {
           content: postValue,
           post_date: formattedCurrentDate,
@@ -79,7 +76,7 @@ export default function PostInput() {
   const deletePost = async (post_id) => {
     try {
       await apiPostData(
-        APIURL + "/delete-post",
+        "/delete-post",
         {
           postId: post_id,
         },

@@ -3,13 +3,8 @@
 import { useState } from "react";
 import FileInput from "./file-input";
 import Button from "./button";
-import {
-  ALLOWED_FILE_EXTENSIONS,
-  APIURL,
-  MAX_FILE_SIZE,
-} from "@/constants/app-info";
+import { ALLOWED_FILE_EXTENSIONS, MAX_FILE_SIZE } from "@/constants/app-info";
 import Image from "next/image";
-import axios from "axios";
 import { apiPostData } from "@/app/apiConnectors/apiPostData";
 
 export default function PicturePopup({ onClose }) {
@@ -51,7 +46,7 @@ export default function PicturePopup({ onClose }) {
     if (!file) return;
     const base64DataUrl = await toBase64(file);
     try {
-      apiPostData(APIURL + "/post-picture", { content: base64DataUrl }, true);
+      apiPostData("/post-picture", { content: base64DataUrl }, true);
       setErrorMessage("New profile picture has been uploaded!");
       window.location.reload();
     } catch (err) {

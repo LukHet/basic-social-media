@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Image from "next/image";
-import { APIURL } from "@/constants/app-info";
 import { apiPostData } from "@/app/apiConnectors/apiPostData";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function CommentLike({ commentId, userId }) {
   const [imgSrc, setImgSrc] = useState("/heart.png");
@@ -24,8 +23,8 @@ export default function CommentLike({ commentId, userId }) {
   const handleHeartClick = async () => {
     if (isLiked) {
       try {
-        const response = await apiPostData(
-          APIURL + "/delete-comment-like",
+        await apiPostData(
+          "/delete-comment-like",
           {
             commentId: commentId,
           },
@@ -41,8 +40,8 @@ export default function CommentLike({ commentId, userId }) {
     }
 
     try {
-      const response = await apiPostData(
-        APIURL + "/comment-like",
+      await apiPostData(
+        "/comment-like",
         {
           commentId: commentId,
         },
@@ -57,11 +56,12 @@ export default function CommentLike({ commentId, userId }) {
 
   const getLikes = async () => {
     try {
-      const response = await axios.get(APIURL + "/get-comment-likes", {
-        params: { commentId: commentId },
-        withCredentials: true,
-      });
-      setLikes(response.data);
+      const response = await apiGetData(
+        "/get-comment-likes",
+        { commentId: commentId },
+        true
+      );
+      setLikes(response?.data);
     } catch (err) {
       console.error(err);
     }

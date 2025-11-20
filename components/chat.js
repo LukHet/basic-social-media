@@ -4,9 +4,8 @@ import TextInput from "./text-input";
 import Button from "./button";
 import { useEffect, useState } from "react";
 import { socket } from "@/app/socket";
-import axios from "axios";
-import { APIURL } from "@/constants/app-info";
 import { apiPostData } from "@/app/apiConnectors/apiPostData";
+import { apiGetData } from "@/app/apiConnectors/apiGetData";
 
 export default function Chat({ chatParameters }) {
   const [isConnected, setIsConnected] = useState(false);
@@ -57,10 +56,11 @@ export default function Chat({ chatParameters }) {
 
   const getMessages = async () => {
     try {
-      const response = await axios.get(APIURL + "/chat-messages", {
-        params: { senderId: senderId, receiverId: receiverId },
-        withCredentials: true,
-      });
+      const response = await apiGetData(
+        "/chat-messages",
+        { senderId: senderId, receiverId: receiverId },
+        true
+      );
       setAllMessages(response?.data);
     } catch (err) {
       console.error(err);
@@ -75,8 +75,8 @@ export default function Chat({ chatParameters }) {
       .slice(0, 19)
       .replace("T", " ");
     try {
-      const res = await apiPostData(
-        APIURL + "/send-message",
+      await apiPostData(
+        "/send-message",
         {
           receiverId: message.receiverId,
           senderId: message.senderId,
@@ -91,15 +91,15 @@ export default function Chat({ chatParameters }) {
     }
   };
 
-  const sendMessage = async (commentId) => {
+  const sendMessage = async () => {
     const currentDate = new Date();
     const formattedCurrentDate = currentDate
       .toISOString()
       .slice(0, 19)
       .replace("T", " ");
     try {
-      const res = apiPostData(
-        APIURL + "/send-message",
+      apiPostData(
+        "/send-message",
         {
           receiverId: receiverId,
           senderId: senderId,
