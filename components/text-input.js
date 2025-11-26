@@ -10,6 +10,7 @@ export default function TextInput({
   onChange,
   value,
   additionalClass,
+  onKeyDown,
 }) {
   return (
     <motion.div
@@ -32,6 +33,7 @@ export default function TextInput({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        onKeyDown={onKeyDown}
       />
     </motion.div>
   );

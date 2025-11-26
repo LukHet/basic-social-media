@@ -30,7 +30,6 @@ import {
   relationshipTypeFriends,
   relationshipTypeNone,
 } from "./helpers.js";
-import { use } from "react";
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -778,13 +777,14 @@ app.get("/other-user-data", verifySession, async (req, res) => {
 });
 
 app.get("/chat-messages", verifySession, async (req, res) => {
-  const { receiverId, senderId } = req.query;
+  const { receiverId } = req.query;
+  const { userId } = req;
 
   if (!isIdValid(receiverId)) {
     return res.status(400).json({ message: "Provide valid receiver ID." });
   }
 
-  if (!isIdValid(senderId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provide valid sender ID." });
   }
 
@@ -793,31 +793,36 @@ app.get("/chat-messages", verifySession, async (req, res) => {
       .prepare(
         "SELECT id, content, sender_id, message_date FROM messages WHERE (receiver_id = ? AND sender_id = ?) OR (receiver_id = ? AND sender_id = ?)"
       )
-      .all(receiverId, senderId, senderId, receiverId);
+      .all(receiverId, userId, userId, receiverId);
 
     return res.status(200).json(foundMessages);
   } catch (err) {
-    return res.status(404).json({ message: "Couldn't get chat messages" });
+    return res.status(500).json({ message: "Couldn't get chat messages" });
   }
 });
 
 app.post("/send-message", verifySession, async (req, res) => {
-  const { receiverId, senderId, content, messageDate } = req.body;
+  const { receiverId, content, messageDate } = req.body;
+  const { userId } = req;
 
   if (!isIdValid(receiverId)) {
     return res.status(400).json({ message: "Provide valid receiver ID." });
   }
 
-  if (!isIdValid(senderId)) {
+  if (!isIdValid(userId)) {
     return res.status(400).json({ message: "Provide valid sender ID." });
   }
 
+  if (!content || content.trim() === "") {
+    return res
+      .status(400)
+      .json({ message: "Message content cannot be empty." });
+  }
+
   try {
-    const newMessage = db
-      .prepare(
-        "INSERT INTO messages (receiver_id, sender_id, content, message_date) VALUES (?, ?, ?, ?)"
-      )
-      .run(receiverId, senderId, content, messageDate);
+    db.prepare(
+      "INSERT INTO messages (receiver_id, sender_id, content, message_date) VALUES (?, ?, ?, ?)"
+    ).run(receiverId, userId, content, messageDate);
     return res.status(200).json({ message: "Message has been sent" });
   } catch (err) {
     return res.status(404).json({ message: err });

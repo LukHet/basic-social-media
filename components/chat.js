@@ -12,23 +12,25 @@ export default function Chat({ chatParameters }) {
   const [message, setMessage] = useState("");
   const [transport, setTransport] = useState("N/A");
   const [allMessages, setAllMessages] = useState([]);
-  const senderId = chatParameters.slug.split("-")[0];
+  const [senderId, setSenderId] = useState(null);
   const receiverId = chatParameters.slug.split("-")[1];
 
   useEffect(() => {
+    getUsersId();
     getMessages();
+
     const onConnect = () => {
       setIsConnected(true);
       setTransport(socket.io.engine.transport.name);
-
-      socket.io.engine.on("upgrade", (transport) => {
-        setTransport(transport.name);
-      });
     };
 
     const onDisconnect = () => {
       setIsConnected(false);
       setTransport("N/A");
+    };
+
+    const onReceive = (message) => {
+      handleSocketMessage(message);
     };
 
     if (socket.connected) {
@@ -37,22 +39,23 @@ export default function Chat({ chatParameters }) {
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
-
-    const handleReceivingMessage = (message) => {
-      console.log("received message", message);
-    };
-
-    socket.on("receive", (message) => {
-      console.log("received something ", message);
-      handleSocketMessage(message);
-    });
+    socket.on("receive", onReceive);
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
-      socket.off("receive", handleReceivingMessage);
+      socket.off("receive", onReceive);
     };
   }, []);
+
+  const getUsersId = async () => {
+    try {
+      const response = await apiGetData("/user-data", {}, true);
+      setSenderId(response?.data?.id);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const getMessages = async () => {
     try {
@@ -67,28 +70,9 @@ export default function Chat({ chatParameters }) {
     }
   };
 
-  const handleSocketMessage = async (message) => {
+  const handleSocketMessage = (message) => {
     if (!message) return;
-    const currentDate = new Date();
-    const formattedCurrentDate = currentDate
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
-    try {
-      await apiPostData(
-        "/send-message",
-        {
-          receiverId: message.receiverId,
-          senderId: message.senderId,
-          content: message.message,
-          messageDate: formattedCurrentDate,
-        },
-        true
-      );
-      await getMessages();
-    } catch (err) {
-      console.log(err);
-    }
+    setAllMessages((prev) => [...prev, message]);
   };
 
   const sendMessage = async () => {
@@ -98,7 +82,7 @@ export default function Chat({ chatParameters }) {
       .slice(0, 19)
       .replace("T", " ");
     try {
-      apiPostData(
+      await apiPostData(
         "/send-message",
         {
           receiverId: receiverId,
@@ -120,9 +104,15 @@ export default function Chat({ chatParameters }) {
 
   const handleSendClick = async () => {
     if (message.trim()) {
-      socket.emit("send", { senderId, receiverId, message });
-      setMessage("");
       await sendMessage();
+      socket.emit("send", { receiverId, message });
+      setMessage("");
+    }
+  };
+
+  const handleEnterClick = (e) => {
+    if (e.key === "Enter") {
+      handleSendClick();
     }
   };
 
@@ -155,6 +145,7 @@ export default function Chat({ chatParameters }) {
           additionalClass={"w-[90%]"}
           value={message}
           onChange={(e) => handleMessageChange(e)}
+          onKeyDown={(e) => handleEnterClick(e)}
         />
         <Button
           label="Send"
