@@ -19,6 +19,7 @@ export default function PostInput() {
   const getPosts = async () => {
     try {
       const response = await apiGetData("/posts", {}, true);
+      console.log("getposts response: ", response);
       setPosts(response?.data);
     } catch (err) {
       console.error(err);
@@ -110,14 +111,15 @@ export default function PostInput() {
         </div>
         <p className="mt-2">{postInfo}</p>
       </div>
-      {posts.map((post) => (
-        <Post
-          post={post}
-          key={post.id}
-          deletePost={() => deletePost(post.id)}
-          userId={currentUserId}
-        />
-      ))}
+      {posts &&
+        posts.map((post) => (
+          <Post
+            post={post}
+            key={post.id}
+            deletePost={() => deletePost(post.id)}
+            userId={currentUserId}
+          />
+        ))}
     </>
   );
 }

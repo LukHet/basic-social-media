@@ -1,3 +1,6 @@
+import { APIURL } from "@/constants/app-info";
+import axios from "axios";
+
 export const apiConnector = async (
   method,
   url,
