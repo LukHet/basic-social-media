@@ -19,7 +19,6 @@ export default function PostInput() {
   const getPosts = async () => {
     try {
       const response = await apiGetData("/posts", {}, true);
-      console.log("getposts response: ", response);
       setPosts(response?.data);
     } catch (err) {
       console.error(err);

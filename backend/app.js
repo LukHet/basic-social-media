@@ -274,10 +274,11 @@ app.get("/friends-posts", verifySession, async (req, res) => {
         `
         SELECT p.id, p.user_id, p.author, p.post_date, p.content
           FROM posts p
-          JOIN users_relationship u ON           
-          (p.id = r.user_first_id AND p.user_second_id = ?)
-          OR (u.id = p.user_second_id AND p.user_first_id = ?)
-          WHERE r.status = ? AND r.type = ?
+          JOIN users_relationship u ON (
+            (p.user_id = u.user_first_id AND u.user_second_id = ?)
+            OR (p.user_id = u.user_second_id AND u.user_first_id = ?)
+          )
+          WHERE u.status = ? AND u.type = ?
           ORDER BY post_date DESC LIMIT ? OFFSET ?
     `
       )
@@ -290,7 +291,7 @@ app.get("/friends-posts", verifySession, async (req, res) => {
         postsOffset
       );
     return res.status(200).json(friendsPosts);
-  } catch (e) {
+  } catch (err) {
     return res
       .status(404)
       .json({ message: "Couldn't get friends posts: ", err });
@@ -1213,6 +1214,41 @@ app.post("/delete-user-from-friendslist", verifySession, async (req, res) => {
     res.status(200).json({ message: "User has been deleted from friendslist" });
   } catch (err) {
     res.status(500).json({ message: "Couldn't delete from friendslist", err });
+  }
+});
+
+app.post("/get-users-relationship", verifySession, async (req, res) => {
+  const { userId } = req;
+  const { friendId } = req.body;
+
+  if (!isIdValid(userId)) {
+    return res.status(400).json({ message: "Provide valid user ID." });
+  }
+
+  if (!isIdValid(friendId)) {
+    return res.status(400).json({ message: "Provide valid friend ID." });
+  }
+
+  try {
+    const usersRelationship = db
+      .prepare(
+        `SELECT type, status FROM user_relationship WHERE (
+          (user_first_id = ? AND user_second_id = ?) OR 
+          (user_second_id = ? AND user_first_id = ?)
+        )`
+      )
+      .get(userId, friendId, friendId, userId);
+
+    if (!usersRelationship) {
+      return res.status(200).json({ status: relationshipTypeNone });
+    }
+
+    res.status(200).json({
+      status: usersRelationship?.status,
+      type: usersRelationship?.type,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Couldn't get users relationship", err });
   }
 });
 

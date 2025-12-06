@@ -56,6 +56,8 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
       }
     };
 
+    const getRelationshipInfo = async () => {};
+
     getProfilePicture();
     setCountriesArray(countries.map((item) => item.country));
 
@@ -262,6 +264,8 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
     setIsPicturePopupOpened(false);
   };
 
+  const handleFriendsButtonClick = () => {};
+
   return (
     <>
       {isLoading ? null : (
@@ -270,8 +274,14 @@ export default function ProfileInfo({ isOwnProfile, slug }) {
             <PicturePopup onClose={closePicturePopup} />
           ) : null}
           <div className="main-page mt-28 max-w-screen-sm p-5 rounded-3xl container mx-auto">
-            <div className="flex justify-between items-center">
-              <h1 className="font-bold">Profile picture:</h1>
+            <div className="flex justify-around items-center mb-3">
+              {!isOwnProfile ? (
+                <Button
+                  additionalClass={"mx-1"}
+                  label="Add to friends"
+                  onClick={() => handleFriendsButtonClick()}
+                />
+              ) : null}
               <Image
                 width={64}
                 height={64}
